@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BellyBeat — Baby Heartbeat &amp; Pregnancy Tracker</title>
+  <meta name="description" content="Hear your baby's heartbeat, track your pregnancy journey, and save precious memories — all in one beautiful app." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --plum:     #3D1A38;
+      --rose:     #C4618A;
+      --peach:    #E8937A;
+      --cream:    #FBF6F2;
+      --cream-2:  #F4E8E2;
+      --ink:      #2A0E26;
+      --ink-soft: #7A4A6A;
+      --ink-mute: #B490A8;
+      --white:    #FFFFFF;
+      --radius:   20px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--cream);
+      color: var(--ink);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Nav ─────────────────────────────────────────── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 40px; height: 60px;
+      background: rgba(251,246,242,0.88);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(196,97,138,0.1);
+    }
+    .nav-back {
+      font-size: 13px; font-weight: 500;
+      color: var(--ink-soft); text-decoration: none;
+      display: flex; align-items: center; gap: 6px;
+      transition: color 0.2s;
+    }
+    .nav-back:hover { color: var(--ink); }
+    .nav-brand {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px; font-weight: 700; font-style: italic;
+      color: var(--plum);
+    }
+    .nav-cta {
+      display: flex; align-items: center; gap: 8px;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--peach), var(--rose));
+      color: var(--white);
+      padding: 9px 20px; border-radius: 100px;
+      font-size: 13px; font-weight: 600;
+      text-decoration: none; transition: opacity 0.2s, transform 0.2s;
+    }
+    .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+
+    /* ── Hero ────────────────────────────────────────── */
+    .hero {
+      min-height: 100vh;
+      display: flex; align-items: center;
+      padding: 100px 24px 80px;
+      background:
+        radial-gradient(ellipse 60% 50% at 80% 30%, rgba(196,97,138,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 10% 70%, rgba(232,147,122,0.10) 0%, transparent 60%),
+        linear-gradient(180deg, var(--cream) 0%, var(--cream-2) 100%);
+    }
+    .hero-inner {
+      max-width: 1080px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 80px; align-items: center;
+    }
+    .hero-app-icon {
+      width: 100px; height: 100px; border-radius: 26px;
+      background: linear-gradient(135deg, #F8D4C8, #D48FAA);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 52px; margin-bottom: 32px;
+      box-shadow: 0 16px 48px rgba(196,97,138,0.3);
+    }
+    .hero-eyebrow {
+      font-size: 11px; font-weight: 600;
+      letter-spacing: 3px; text-transform: uppercase;
+      color: var(--rose); margin-bottom: 16px;
+    }
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(36px, 5vw, 58px);
+      font-weight: 700; line-height: 1.1;
+      letter-spacing: -1px; color: var(--ink);
+      margin-bottom: 20px;
+    }
+    .hero h1 em { font-style: italic; color: var(--rose); }
+    .hero-sub {
+      font-size: 16px; line-height: 1.75;
+      color: var(--ink-soft); margin-bottom: 40px;
+      max-width: 420px;
+    }
+    .hero-buttons {
+      display: flex; flex-wrap: wrap; gap: 12px;
+    }
+    .btn-store {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--plum); color: var(--white);
+      padding: 12px 22px; border-radius: 14px;
+      text-decoration: none; transition: opacity 0.2s, transform 0.2s;
+    }
+    .btn-store:hover { opacity: 0.85; transform: translateY(-2px); }
+    .btn-store-icon { font-size: 22px; line-height: 1; }
+    .btn-store-text { display: flex; flex-direction: column; }
+    .btn-store-label { font-size: 10px; font-weight: 500; opacity: 0.7; letter-spacing: 0.5px; }
+    .btn-store-name { font-size: 15px; font-weight: 700; line-height: 1.2; }
+
+    /* Phone mockup */
+    .hero-visual {
+      display: flex; justify-content: center; align-items: center;
+    }
+    .phone-mockup {
+      width: 260px; height: 530px;
+      background: linear-gradient(160deg, #2D1230, #4A1F45);
+      border-radius: 44px;
+      border: 2px solid rgba(255,255,255,0.1);
+      box-shadow:
+        0 40px 100px rgba(61,26,56,0.35),
+        inset 0 1px 0 rgba(255,255,255,0.08);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 16px; padding: 32px;
+      position: relative; overflow: hidden;
+    }
+    .phone-mockup::before {
+      content: '';
+      position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      width: 80px; height: 22px;
+      background: #1a0a18; border-radius: 0 0 14px 14px;
+    }
+    .phone-glow {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 180px; height: 180px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(196,97,138,0.3), transparent 70%);
+    }
+    .phone-orb {
+      width: 100px; height: 100px; border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #F8C8DA, #B04070);
+      box-shadow: 0 0 40px rgba(196,97,138,0.5);
+      position: relative; z-index: 1;
+    }
+    .phone-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px; font-weight: 700; font-style: italic;
+      color: rgba(255,255,255,0.9);
+      position: relative; z-index: 1;
+    }
+    .phone-sub {
+      font-size: 11px; color: rgba(255,255,255,0.4);
+      letter-spacing: 2px; text-transform: uppercase;
+      position: relative; z-index: 1;
+    }
+
+    /* ── Features ────────────────────────────────────── */
+    .features-section {
+      padding: 100px 24px;
+      background: var(--white);
+    }
+    .features-inner { max-width: 1080px; margin: 0 auto; }
+    .features-header { text-align: center; margin-bottom: 64px; }
+    .section-label {
+      font-size: 11px; font-weight: 600;
+      letter-spacing: 3px; text-transform: uppercase;
+      color: var(--rose); margin-bottom: 14px;
+    }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(30px, 4vw, 46px);
+      font-weight: 700; line-height: 1.1;
+      letter-spacing: -0.8px; color: var(--ink);
+    }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 24px;
+    }
+    .feature-card {
+      padding: 32px; border-radius: 20px;
+      border: 1px solid rgba(196,97,138,0.12);
+      background: var(--cream);
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+    .feature-card:hover {
+      box-shadow: 0 12px 40px rgba(61,26,56,0.08);
+      transform: translateY(-2px);
+    }
+    .feature-icon {
+      font-size: 28px; margin-bottom: 16px;
+    }
+    .feature-card h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px; font-weight: 700;
+      color: var(--ink); margin-bottom: 10px;
+    }
+    .feature-card p {
+      font-size: 14px; line-height: 1.7;
+      color: var(--ink-soft);
+    }
+
+    /* ── Stats ───────────────────────────────────────── */
+    .stats-section {
+      padding: 80px 24px;
+      background: linear-gradient(135deg, var(--plum), #5A1F54);
+    }
+    .stats-inner {
+      max-width: 860px; margin: 0 auto; text-align: center;
+    }
+    .stats-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 700; font-style: italic;
+      color: var(--white); margin-bottom: 48px; line-height: 1.2;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 40px;
+    }
+    .stat-item {}
+    .stat-number {
+      font-family: 'Playfair Display', serif;
+      font-size: 48px; font-weight: 700;
+      color: var(--white); line-height: 1;
+    }
+    .stat-label {
+      font-size: 13px; color: rgba(255,255,255,0.5);
+      margin-top: 8px; letter-spacing: 0.3px;
+    }
+
+    /* ── CTA ─────────────────────────────────────────── */
+    .cta-section {
+      padding: 100px 24px;
+      background: var(--cream-2);
+      text-align: center;
+    }
+    .cta-section .section-title { margin-bottom: 14px; }
+    .cta-sub {
+      font-size: 16px; color: var(--ink-soft);
+      margin-bottom: 40px; line-height: 1.7;
+    }
+    .cta-buttons {
+      display: flex; justify-content: center; flex-wrap: wrap; gap: 12px;
+    }
+
+    /* ── Footer ──────────────────────────────────────── */
+    footer {
+      background: var(--plum);
+      padding: 40px 24px;
+    }
+    .footer-inner {
+      max-width: 1080px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 16px;
+    }
+    .footer-brand {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px; font-weight: 700; font-style: italic;
+      color: rgba(255,255,255,0.8);
+    }
+    .footer-links {
+      display: flex; gap: 24px; list-style: none;
+    }
+    .footer-links a {
+      font-size: 13px; color: rgba(255,255,255,0.4);
+      text-decoration: none; transition: color 0.2s;
+    }
+    .footer-links a:hover { color: rgba(255,255,255,0.8); }
+    .footer-copy {
+      font-size: 12px; color: rgba(255,255,255,0.2);
+      width: 100%; margin-top: 8px;
+    }
+
+    /* ── Responsive ──────────────────────────────────── */
+    @media (max-width: 768px) {
+      .hero-inner { grid-template-columns: 1fr; gap: 48px; }
+      .hero-visual { order: -1; }
+      .phone-mockup { width: 200px; height: 400px; }
+      nav { padding: 0 20px; }
+      .nav-back span { display: none; }
+    }
+    @media (max-width: 480px) {
+      .footer-inner { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="/" class="nav-back">← <span>Appvalent</span></a>
+    <div class="nav-brand">BellyBeat</div>
+    <div class="nav-cta">
+      <a href="https://play.google.com/store/apps/details?id=com.bellybeat.app" class="btn-primary" target="_blank">Get the App</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-inner">
+      <div>
+        <div class="hero-app-icon">🤰</div>
+        <div class="hero-eyebrow">BellyBeat · Baby Heartbeat App</div>
+        <h1>Hear every<br><em>precious</em> heartbeat</h1>
+        <p class="hero-sub">The beautiful pregnancy companion that helps you hear your baby's heartbeat, track your journey week by week, and save memories that last forever.</p>
+        <div class="hero-buttons">
+          <a href="https://play.google.com/store/apps/details?id=com.bellybeat.app" class="btn-store" target="_blank">
+            <span class="btn-store-icon">▶</span>
+            <span class="btn-store-text">
+              <span class="btn-store-label">Get it on</span>
+              <span class="btn-store-name">Google Play</span>
+            </span>
+          </a>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="phone-mockup">
+          <div class="phone-glow"></div>
+          <div class="phone-orb"></div>
+          <div class="phone-title">BellyBeat</div>
+          <div class="phone-sub">Hear every moment</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="features-section" id="features">
+    <div class="features-inner">
+      <div class="features-header">
+        <div class="section-label">Features</div>
+        <h2 class="section-title">Everything for your<br>pregnancy journey</h2>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">🫀</div>
+          <h3>Baby Heartbeat</h3>
+          <p>Use your phone's microphone to listen to your baby's heartbeat and save recordings to revisit any time.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📅</div>
+          <h3>Week-by-Week Tracker</h3>
+          <p>Follow your baby's growth with detailed weekly updates and milestones throughout all 40 weeks.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📔</div>
+          <h3>Pregnancy Journal</h3>
+          <p>Log how you're feeling, note kick counts, and keep a beautiful diary of your entire pregnancy.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🖼</div>
+          <h3>Memory Timeline</h3>
+          <p>All your recordings and journal entries beautifully organised into a timeline you can share with family.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">✨</div>
+          <h3>AI Pregnancy Guide</h3>
+          <p>Get personalised answers to your pregnancy questions from an AI companion available around the clock.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🔒</div>
+          <h3>Private &amp; Secure</h3>
+          <p>Your recordings and journal stay on your device. We never sell your data or share it with anyone.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <section class="stats-section">
+    <div class="stats-inner">
+      <h2 class="stats-title">"The most beautiful pregnancy<br>app I've ever used."</h2>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-number">40</div>
+          <div class="stat-label">Weeks of coverage</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">∞</div>
+          <div class="stat-label">Memories saved</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">4.8★</div>
+          <div class="stat-label">Average rating</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="section-label">Available now</div>
+    <h2 class="section-title">Start your journey today</h2>
+    <p class="cta-sub">Free to download. Premium features available with a subscription.</p>
+    <div class="cta-buttons">
+      <a href="https://play.google.com/store/apps/details?id=com.bellybeat.app" class="btn-store" target="_blank" style="background:var(--plum);">
+        <span class="btn-store-icon">▶</span>
+        <span class="btn-store-text">
+          <span class="btn-store-label">Get it on</span>
+          <span class="btn-store-name">Google Play</span>
+        </span>
+      </a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-brand">BellyBeat</div>
+      <ul class="footer-links">
+        <li><a href="/">Appvalent</a></li>
+        <li><a href="/bellybeat/privacy">Privacy Policy</a></li>
+        <li><a href="mailto:hello@appvalent.com">Support</a></li>
+      </ul>
+      <div class="footer-copy">© 2026 Appvalent Limited. BellyBeat is not a medical device.</div>
+    </div>
+  </footer>
+
+</body>
+</html>

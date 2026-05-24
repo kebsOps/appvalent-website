@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Appvalent — Meaningful Mobile Apps</title>
+  <meta name="description" content="Appvalent Limited builds thoughtful, beautiful mobile apps for iOS and Android." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:      #0D0D1A;
+      --ink-soft: #4A4A60;
+      --ink-mute: #9898A8;
+      --bg:       #FAFAF8;
+      --bg-alt:   #F3F2EF;
+      --accent:   #4F3F8F;
+      --accent-2: #C4618A;
+      --gold:     #C9A84C;
+      --white:    #FFFFFF;
+      --radius:   16px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Nav ─────────────────────────────────────────── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 40px; height: 64px;
+      background: rgba(250,250,248,0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+    .nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px; font-weight: 700;
+      color: var(--ink); text-decoration: none;
+      letter-spacing: -0.3px;
+    }
+    .nav-logo span { color: var(--accent); }
+    .nav-links { display: flex; gap: 32px; list-style: none; }
+    .nav-links a {
+      font-size: 13.5px; font-weight: 500;
+      color: var(--ink-soft); text-decoration: none;
+      letter-spacing: 0.2px; transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--ink); }
+
+    /* ── Hero ────────────────────────────────────────── */
+    .hero {
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      text-align: center;
+      padding: 120px 24px 80px;
+      background:
+        radial-gradient(ellipse 70% 50% at 20% 40%, rgba(79,63,143,0.08) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 80% 60%, rgba(196,97,138,0.07) 0%, transparent 60%),
+        var(--bg);
+    }
+    .hero-eyebrow {
+      display: inline-block;
+      font-size: 11px; font-weight: 600;
+      letter-spacing: 3px; text-transform: uppercase;
+      color: var(--accent);
+      background: rgba(79,63,143,0.08);
+      padding: 6px 16px; border-radius: 100px;
+      margin-bottom: 28px;
+    }
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(46px, 7vw, 82px);
+      font-weight: 700; line-height: 1.08;
+      letter-spacing: -1.5px;
+      color: var(--ink);
+      max-width: 760px; margin: 0 auto 28px;
+    }
+    .hero h1 em { font-style: italic; color: var(--accent); }
+    .hero-sub {
+      font-size: 17px; font-weight: 400; line-height: 1.7;
+      color: var(--ink-soft);
+      max-width: 480px; margin: 0 auto 48px;
+    }
+    .hero-cta {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--ink); color: var(--white);
+      padding: 14px 30px; border-radius: 100px;
+      font-size: 14px; font-weight: 600;
+      text-decoration: none; letter-spacing: 0.2px;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .hero-cta:hover { opacity: 0.85; transform: translateY(-1px); }
+
+    /* ── Section shared ──────────────────────────────── */
+    section { padding: 100px 24px; }
+    .container { max-width: 1080px; margin: 0 auto; }
+    .section-label {
+      font-size: 11px; font-weight: 600;
+      letter-spacing: 3px; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 16px;
+    }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(32px, 4vw, 50px);
+      font-weight: 700; line-height: 1.1;
+      letter-spacing: -0.8px; color: var(--ink);
+      margin-bottom: 16px;
+    }
+    .section-sub {
+      font-size: 16px; color: var(--ink-soft);
+      line-height: 1.7; max-width: 520px;
+    }
+
+    /* ── Apps grid ───────────────────────────────────── */
+    .apps-section { background: var(--bg); }
+    .apps-header { margin-bottom: 56px; }
+    .apps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 24px;
+    }
+    .app-card {
+      background: var(--white);
+      border: 1px solid rgba(0,0,0,0.07);
+      border-radius: 24px;
+      padding: 36px;
+      text-decoration: none;
+      color: inherit;
+      transition: box-shadow 0.25s, transform 0.25s;
+      display: flex; flex-direction: column; gap: 20px;
+    }
+    .app-card:hover {
+      box-shadow: 0 20px 60px rgba(0,0,0,0.09);
+      transform: translateY(-3px);
+    }
+    .app-icon {
+      width: 68px; height: 68px; border-radius: 18px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 32px;
+    }
+    .app-icon-bellybeat {
+      background: linear-gradient(135deg, #F8D4C8, #D48FAA);
+    }
+    .app-card-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px; font-weight: 700;
+      letter-spacing: -0.3px; color: var(--ink);
+    }
+    .app-card-tagline {
+      font-size: 14px; color: var(--ink-soft);
+      line-height: 1.6;
+    }
+    .app-card-platforms {
+      display: flex; gap: 8px; margin-top: auto;
+    }
+    .platform-badge {
+      font-size: 11px; font-weight: 600;
+      letter-spacing: 0.5px;
+      padding: 5px 12px; border-radius: 100px;
+      background: var(--bg-alt); color: var(--ink-soft);
+    }
+    .app-card-arrow {
+      margin-left: auto; font-size: 18px;
+      color: var(--ink-mute); transition: transform 0.2s;
+    }
+    .app-card:hover .app-card-arrow { transform: translateX(4px); }
+
+    .app-card-soon {
+      background: var(--bg-alt);
+      border: 2px dashed rgba(0,0,0,0.1);
+      cursor: default;
+    }
+    .app-card-soon:hover {
+      box-shadow: none; transform: none;
+    }
+    .soon-badge {
+      display: inline-block;
+      font-size: 11px; font-weight: 600;
+      letter-spacing: 2px; text-transform: uppercase;
+      color: var(--ink-mute);
+      background: rgba(0,0,0,0.05);
+      padding: 5px 12px; border-radius: 100px;
+    }
+
+    /* ── About ───────────────────────────────────────── */
+    .about-section {
+      background: var(--ink);
+      color: var(--white);
+    }
+    .about-section .section-label { color: rgba(255,255,255,0.4); }
+    .about-section .section-title { color: var(--white); }
+    .about-section .section-sub { color: rgba(255,255,255,0.55); max-width: 600px; }
+    .about-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 32px; margin-top: 60px;
+    }
+    .about-item h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px; font-weight: 700;
+      color: var(--white); margin-bottom: 10px;
+    }
+    .about-item p {
+      font-size: 14px; line-height: 1.7;
+      color: rgba(255,255,255,0.5);
+    }
+
+    /* ── Footer ──────────────────────────────────────── */
+    footer {
+      background: var(--ink);
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding: 40px 24px;
+    }
+    .footer-inner {
+      max-width: 1080px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 16px;
+    }
+    .footer-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 16px; font-weight: 700;
+      color: rgba(255,255,255,0.5); text-decoration: none;
+    }
+    .footer-logo span { color: rgba(255,255,255,0.25); }
+    .footer-links {
+      display: flex; gap: 24px; list-style: none;
+    }
+    .footer-links a {
+      font-size: 13px; color: rgba(255,255,255,0.35);
+      text-decoration: none; transition: color 0.2s;
+    }
+    .footer-links a:hover { color: rgba(255,255,255,0.7); }
+    .footer-copy {
+      font-size: 12px; color: rgba(255,255,255,0.2);
+      width: 100%; margin-top: 8px;
+    }
+
+    /* ── Responsive ──────────────────────────────────── */
+    @media (max-width: 640px) {
+      nav { padding: 0 20px; }
+      .nav-links { display: none; }
+      .footer-inner { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="/" class="nav-logo">App<span>valent</span></a>
+    <ul class="nav-links">
+      <li><a href="#apps">Apps</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="mailto:hello@appvalent.com">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div>
+      <div class="hero-eyebrow">Appvalent Limited</div>
+      <h1>Apps that <em>matter</em><br>to people's lives</h1>
+      <p class="hero-sub">We build thoughtful, beautifully crafted mobile experiences for iOS and Android.</p>
+      <a href="#apps" class="hero-cta">Explore our apps ↓</a>
+    </div>
+  </section>
+
+  <!-- Apps -->
+  <section class="apps-section" id="apps">
+    <div class="container">
+      <div class="apps-header">
+        <div class="section-label">Our Apps</div>
+        <h2 class="section-title">Made with care,<br>built to last</h2>
+        <p class="section-sub">Each app we build solves a real problem for real people — designed with attention to every detail.</p>
+      </div>
+      <div class="apps-grid">
+
+        <!-- BellyBeat -->
+        <a href="/bellybeat" class="app-card">
+          <div class="app-icon app-icon-bellybeat">🤰</div>
+          <div>
+            <div class="app-card-name">BellyBeat</div>
+            <div class="app-card-tagline">Hear your baby's heartbeat. Track every precious moment of your pregnancy journey.</div>
+          </div>
+          <div class="app-card-platforms">
+            <span class="platform-badge">Android</span>
+            <span class="app-card-arrow">→</span>
+          </div>
+        </a>
+
+        <!-- Coming soon slot -->
+        <div class="app-card app-card-soon">
+          <div class="app-icon" style="background:rgba(0,0,0,0.05);font-size:28px;">✦</div>
+          <div>
+            <div class="app-card-name" style="color:#9898A8;">Next App</div>
+            <div class="app-card-tagline">Something new is in the works. Stay tuned.</div>
+          </div>
+          <div><span class="soon-badge">Coming soon</span></div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section class="about-section" id="about">
+    <div class="container">
+      <div class="section-label">About Us</div>
+      <h2 class="section-title">Small team,<br>big ambitions</h2>
+      <p class="section-sub">Appvalent Limited is an independent app studio dedicated to building high-quality mobile applications that make a meaningful difference in everyday life.</p>
+      <div class="about-grid">
+        <div class="about-item">
+          <h3>Quality First</h3>
+          <p>Every pixel, interaction, and feature is considered carefully before it ships.</p>
+        </div>
+        <div class="about-item">
+          <h3>Privacy Minded</h3>
+          <p>We collect only what's necessary and never sell user data to third parties.</p>
+        </div>
+        <div class="about-item">
+          <h3>Always Improving</h3>
+          <p>We listen to our users and ship regular updates based on real feedback.</p>
+        </div>
+        <div class="about-item">
+          <h3>Built to Last</h3>
+          <p>We're in this for the long run — our apps are maintained and supported over time.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-inner">
+      <a href="/" class="footer-logo">App<span>valent</span></a>
+      <ul class="footer-links">
+        <li><a href="#apps">Apps</a></li>
+        <li><a href="/bellybeat">BellyBeat</a></li>
+        <li><a href="mailto:hello@appvalent.com">Contact</a></li>
+      </ul>
+      <div class="footer-copy">© 2026 Appvalent Limited. All rights reserved.</div>
+    </div>
+  </footer>
+
+</body>
+</html>
