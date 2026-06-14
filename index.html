@@ -145,12 +145,9 @@
     }
     .app-icon {
       width: 68px; height: 68px; border-radius: 18px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 32px;
+      overflow: hidden; flex-shrink: 0;
     }
-    .app-icon-bellybeat {
-      background: linear-gradient(135deg, #F8D4C8, #D48FAA);
-    }
+    .app-icon img { width: 100%; height: 100%; display: block; }
     .app-card-name {
       font-family: 'Playfair Display', serif;
       font-size: 22px; font-weight: 700;
@@ -286,7 +283,7 @@
 
         <!-- BellyBeat -->
         <a href="/bellybeat" class="app-card">
-          <div class="app-icon app-icon-bellybeat">🤰</div>
+          <div class="app-icon"><img src="/bellybeat/app-icon.png" alt="Blumly icon" /></div>
           <div>
             <div class="app-card-name">Blumly</div>
             <div class="app-card-tagline">Hear your baby's heartbeat. Track every precious moment of your pregnancy journey.</div>

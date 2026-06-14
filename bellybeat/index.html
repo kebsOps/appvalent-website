@@ -83,10 +83,12 @@
     }
     .hero-app-icon {
       width: 100px; height: 100px; border-radius: 26px;
-      background: linear-gradient(135deg, #F8D4C8, #D48FAA);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 52px; margin-bottom: 32px;
+      margin-bottom: 32px;
       box-shadow: 0 16px 48px rgba(196,97,138,0.3);
+      overflow: hidden; display: block;
+    }
+    .hero-app-icon img {
+      width: 100%; height: 100%; display: block;
     }
     .hero-eyebrow {
       font-size: 11px; font-weight: 600;
@@ -151,11 +153,12 @@
       background: radial-gradient(circle, rgba(196,97,138,0.3), transparent 70%);
     }
     .phone-orb {
-      width: 100px; height: 100px; border-radius: 50%;
-      background: radial-gradient(circle at 35% 35%, #F8C8DA, #B04070);
+      width: 120px; height: 120px; border-radius: 28px;
+      overflow: hidden;
       box-shadow: 0 0 40px rgba(196,97,138,0.5);
       position: relative; z-index: 1;
     }
+    .phone-orb img { width: 100%; height: 100%; display: block; }
     .phone-title {
       font-family: 'Playfair Display', serif;
       font-size: 20px; font-weight: 700; font-style: italic;
@@ -314,7 +317,7 @@
   <section class="hero">
     <div class="hero-inner">
       <div>
-        <div class="hero-app-icon">🤰</div>
+        <div class="hero-app-icon"><img src="/bellybeat/app-icon.png" alt="Blumly app icon" /></div>
         <div class="hero-eyebrow">Blumly · Baby Heartbeat App</div>
         <h1>Hear every<br><em>precious</em> heartbeat</h1>
         <p class="hero-sub">The beautiful pregnancy companion that helps you hear your baby's heartbeat, track your journey week by week, and save memories that last forever.</p>
@@ -331,7 +334,7 @@
       <div class="hero-visual">
         <div class="phone-mockup">
           <div class="phone-glow"></div>
-          <div class="phone-orb"></div>
+          <div class="phone-orb"><img src="/bellybeat/app-icon.png" alt="Blumly" /></div>
           <div class="phone-title">Blumly</div>
           <div class="phone-sub">Hear every moment</div>
         </div>
