@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Glow: Face Score — Skin Tracking on Your Phone</title>
+  <meta name="description" content="Take one selfie a day. Glow measures it on your phone and turns it into a score you can track — your photos never leave your device." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --plum:     #2B1B4D;
+      --lavender: #8B5CF6;
+      --pink:     #EC4899;
+      --peach:    #FDBA74;
+      --cream:    #FBF8F4;
+      --cream-2:  #F2EEF9;
+      --ink:      #1A1320;
+      --ink-soft: #5B4F6B;
+      --ink-mute: #9C90AB;
+      --white:    #FFFFFF;
+      --radius:   20px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--cream);
+      color: var(--ink);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Nav ─────────────────────────────────────────── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 40px; height: 60px;
+      background: rgba(251,248,244,0.88);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(139,92,246,0.12);
+    }
+    .nav-back {
+      font-size: 13px; font-weight: 500;
+      color: var(--ink-soft); text-decoration: none;
+      display: flex; align-items: center; gap: 6px;
+      transition: color 0.2s;
+    }
+    .nav-back:hover { color: var(--ink); }
+    .nav-brand {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px; font-weight: 700; font-style: italic;
+      color: var(--plum);
+    }
+    .nav-cta { display: flex; align-items: center; gap: 8px; }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--lavender), var(--pink));
+      color: var(--white);
+      padding: 9px 20px; border-radius: 100px;
+      font-size: 13px; font-weight: 600;
+      text-decoration: none; transition: opacity 0.2s, transform 0.2s;
+    }
+    .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+
+    /* ── Hero ────────────────────────────────────────── */
+    .hero {
+      min-height: 100vh;
+      display: flex; align-items: center;
+      padding: 100px 24px 80px;
+      background:
+        radial-gradient(ellipse 60% 50% at 80% 30%, rgba(139,92,246,0.14) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 10% 70%, rgba(236,72,153,0.10) 0%, transparent 60%),
+        linear-gradient(180deg, var(--cream) 0%, var(--cream-2) 100%);
+    }
+    .hero-inner {
+      max-width: 1080px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 80px; align-items: center;
+    }
+    .hero-app-icon {
+      width: 100px; height: 100px; border-radius: 26px;
+      margin-bottom: 32px;
+      box-shadow: 0 16px 48px rgba(139,92,246,0.32);
+      overflow: hidden; display: block;
+    }
+    .hero-app-icon img { width: 100%; height: 100%; display: block; }
+    .hero-eyebrow {
+      font-size: 11px; font-weight: 600;
+      letter-spacing: 3px; text-transform: uppercase;
+      color: var(--lavender); margin-bottom: 16px;
+    }
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(36px, 5vw, 58px);
+      font-weight: 700; line-height: 1.1;
+      letter-spacing: -1px; color: var(--ink);
+      margin-bottom: 20px;
+    }
+    .hero h1 em { font-style: italic; color: var(--pink); }
+    .hero-sub {
+      font-size: 16px; line-height: 1.75;
+      color: var(--ink-soft); margin-bottom: 40px;
+      max-width: 440px;
+    }
+    .hero-buttons { display: flex; flex-wrap: wrap; gap: 12px; }
+    .btn-store {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--plum); color: var(--white);
+      padding: 12px 22px; border-radius: 14px;
+      text-decoration: none; transition: opacity 0.2s, transform 0.2s;
+    }
+    .btn-store:hover { opacity: 0.85; transform: translateY(-2px); }
+    .btn-store-icon { display: flex; align-items: center; line-height: 1; }
+    .btn-store-text { display: flex; flex-direction: column; }
+    .btn-store-label { font-size: 10px; font-weight: 500; opacity: 0.7; letter-spacing: 0.5px; }
+    .btn-store-name { font-size: 15px; font-weight: 700; line-height: 1.2; }
+    .btn-store-soon { opacity: 0.45; pointer-events: none; }
+
+    /* Phone mockup — the score ring, which is the app's signature */
+    .hero-visual { display: flex; justify-content: center; align-items: center; }
+    .phone-mockup {
+      width: 260px; height: 530px;
+      background: linear-gradient(160deg, #150F26, #2B1B4D);
+      border-radius: 44px;
+      border: 2px solid rgba(255,255,255,0.1);
+      box-shadow:
+        0 40px 100px rgba(43,27,77,0.38),
+        inset 0 1px 0 rgba(255,255,255,0.08);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 18px; padding: 32px;
+      position: relative; overflow: hidden;
+    }
+    .phone-mockup::before {
+      content: '';
+      position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      width: 80px; height: 22px;
+      background: #100A1C; border-radius: 0 0 14px 14px;
+    }
+    .phone-glow {
+      position: absolute; top: 44%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 200px; height: 200px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(236,72,153,0.32), transparent 70%);
+    }
+    .score-ring {
+      width: 150px; height: 150px; border-radius: 50%;
+      background: conic-gradient(from 210deg, var(--lavender), var(--pink), var(--peach) 78%, rgba(255,255,255,0.08) 78%);
+      display: flex; align-items: center; justify-content: center;
+      position: relative; z-index: 1;
+    }
+    .score-ring::after {
+      content: ''; position: absolute; inset: 13px;
+      border-radius: 50%; background: #1B1233;
+    }
+    .score-value {
+      position: relative; z-index: 2; text-align: center;
+    }
+    .score-number {
+      font-size: 44px; font-weight: 700; color: var(--white); line-height: 1;
+    }
+    .score-caption {
+      font-size: 9px; letter-spacing: 3px; text-transform: uppercase;
+      color: rgba(255,255,255,0.45); margin-top: 6px;
+    }
+    .phone-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px; font-weight: 700; font-style: italic;
+      color: rgba(255,255,255,0.9);
+      position: relative; z-index: 1;
+    }
+    .phone-sub {
+      font-size: 11px; color: rgba(255,255,255,0.4);
+      letter-spacing: 2px; text-transform: uppercase;
+      position: relative; z-index: 1;
+    }
+
+    /* ── Features ────────────────────────────────────── */
+    .features-section { padding: 100px 24px; background: var(--white); }
+    .features-inner { max-width: 1080px; margin: 0 auto; }
+    .features-header { text-align: center; margin-bottom: 64px; }
+    .section-label {
+      font-size: 11px; font-weight: 600;
+      letter-spacing: 3px; text-transform: uppercase;
+      color: var(--lavender); margin-bottom: 14px;
+    }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(30px, 4vw, 46px);
+      font-weight: 700; line-height: 1.1;
+      letter-spacing: -0.8px; color: var(--ink);
+    }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 24px;
+    }
+    .feature-card {
+      padding: 32px; border-radius: 20px;
+      border: 1px solid rgba(139,92,246,0.14);
+      background: var(--cream);
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+    .feature-card:hover {
+      box-shadow: 0 12px 40px rgba(43,27,77,0.08);
+      transform: translateY(-2px);
+    }
+    .feature-icon { margin-bottom: 16px; height: 30px; }
+    .feature-icon svg { width: 30px; height: 30px; display: block; }
+    .feature-card h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px; font-weight: 700;
+      color: var(--ink); margin-bottom: 10px;
+    }
+    .feature-card p { font-size: 14px; line-height: 1.7; color: var(--ink-soft); }
+
+    /* ── How it works ────────────────────────────────── */
+    .how-section { padding: 80px 24px; background: linear-gradient(135deg, var(--plum), #46256B); }
+    .how-inner { max-width: 860px; margin: 0 auto; text-align: center; }
+    .how-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(26px, 4vw, 38px);
+      font-weight: 700; font-style: italic;
+      color: var(--white); margin-bottom: 20px; line-height: 1.25;
+    }
+    .how-body {
+      font-size: 15px; line-height: 1.8;
+      color: rgba(255,255,255,0.65);
+      max-width: 620px; margin: 0 auto 44px;
+    }
+    .how-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 40px;
+    }
+    .how-number {
+      font-family: 'Playfair Display', serif;
+      font-size: 42px; font-weight: 700;
+      color: var(--white); line-height: 1;
+    }
+    .how-label { font-size: 13px; color: rgba(255,255,255,0.5); margin-top: 8px; }
+
+    /* ── CTA ─────────────────────────────────────────── */
+    .cta-section { padding: 100px 24px; background: var(--cream-2); text-align: center; }
+    .cta-section .section-title { margin-bottom: 14px; }
+    .cta-sub { font-size: 16px; color: var(--ink-soft); margin-bottom: 40px; line-height: 1.7; }
+    .cta-buttons { display: flex; justify-content: center; flex-wrap: wrap; gap: 12px; }
+
+    /* ── Footer ──────────────────────────────────────── */
+    footer { background: var(--plum); padding: 40px 24px; }
+    .footer-inner {
+      max-width: 1080px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 16px;
+    }
+    .footer-brand {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px; font-weight: 700; font-style: italic;
+      color: rgba(255,255,255,0.8);
+    }
+    .footer-links { display: flex; gap: 24px; list-style: none; flex-wrap: wrap; }
+    .footer-links a {
+      font-size: 13px; color: rgba(255,255,255,0.4);
+      text-decoration: none; transition: color 0.2s;
+    }
+    .footer-links a:hover { color: rgba(255,255,255,0.8); }
+    .footer-copy { font-size: 12px; color: rgba(255,255,255,0.28); width: 100%; margin-top: 8px; line-height: 1.6; }
+
+    /* ── Responsive ──────────────────────────────────── */
+    @media (max-width: 768px) {
+      .hero-inner { grid-template-columns: 1fr; gap: 48px; }
+      .hero-visual { order: -1; }
+      .phone-mockup { width: 210px; height: 420px; }
+      .score-ring { width: 124px; height: 124px; }
+      .score-number { font-size: 36px; }
+      nav { padding: 0 20px; }
+      .nav-back span { display: none; }
+    }
+    @media (max-width: 480px) {
+      .footer-inner { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="/" class="nav-back">← <span>Appvalent</span></a>
+    <div class="nav-brand">Glow</div>
+    <div class="nav-cta">
+      <a href="#get" class="btn-primary">Get the App</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-inner">
+      <div>
+        <div class="hero-app-icon"><img src="/glow/app-icon.png" alt="Glow: Face Score app icon" /></div>
+        <div class="hero-eyebrow">Glow · Face Score</div>
+        <h1>One selfie a day,<br><em>measured</em> on your phone</h1>
+        <p class="hero-sub">Glow reads brightness, texture, evenness, pore visibility and oil balance from your photo, and turns them into a score you can watch over time. Your photos never leave your device.</p>
+        <div class="hero-buttons">
+          <a href="#get" class="btn-store">
+          <span class="btn-store-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M3.6 2.1a1 1 0 0 0-.5.9v18a1 1 0 0 0 .5.9l9.6-9.9zM14.4 11l2.9-3-11.5-6.6zm0 2L5.8 22.6 17.3 16zm1.4-.7 3.9-2.2c1-.6 1-1.6 0-2.2l-3.4-2z"/></svg></span>
+            <span class="btn-store-text">
+              <span class="btn-store-label">Coming soon to</span>
+              <span class="btn-store-name">Google Play</span>
+            </span>
+          </a>
+          <a href="#get" class="btn-store">
+          <span class="btn-store-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M16.4 12.7c0-2.3 1.9-3.4 2-3.5-1.1-1.6-2.8-1.8-3.4-1.8-1.4-.1-2.8.9-3.5.9s-1.8-.9-3-.8c-1.5 0-2.9.9-3.7 2.3-1.6 2.7-.4 6.8 1.1 9 .8 1.1 1.7 2.3 2.9 2.2 1.2 0 1.6-.7 3-.7s1.8.7 3 .7c1.3 0 2.1-1.1 2.8-2.2.9-1.2 1.3-2.5 1.3-2.5s-2.5-1-2.5-3.6zM14.1 5.9c.6-.8 1.1-1.9 1-3-.9 0-2.1.6-2.8 1.4-.6.7-1.1 1.8-1 2.9 1 .1 2.1-.5 2.8-1.3z"/></svg></span>
+            <span class="btn-store-text">
+              <span class="btn-store-label">Coming soon to</span>
+              <span class="btn-store-name">App Store</span>
+            </span>
+          </a>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="phone-mockup">
+          <div class="phone-glow"></div>
+          <div class="score-ring">
+            <div class="score-value">
+              <div class="score-number">86</div>
+              <div class="score-caption">Glow Score</div>
+            </div>
+          </div>
+          <div class="phone-title">Glow</div>
+          <div class="phone-sub">Track the change</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="features-section" id="features">
+    <div class="features-inner">
+      <div class="features-header">
+        <div class="section-label">Features</div>
+        <h2 class="section-title">Six measurements,<br>tracked over time</h2>
+      </div>
+      <div class="features-grid">
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 3.2 L20.8 10.6 M3.2 10.6 L12 3.2" /><path d="M2.8 6.4h18.4a3.6 3.6 0 0 1 0 0v13.8H2.8z" fill="none" /><circle cx="12" cy="13" r="3.6" />
+            </svg>
+          </div>
+          <h3>A score from your camera</h3>
+          <p>Take a selfie and Glow measures it — brightness, sharpness, colour evenness and how much light your skin reflects — then turns those into one number.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#EC4899" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M3.4 16.6 9 10.8l4 3.6 7.6-8.2" /><path d="M15 6.2h5.6v5.6" />
+            </svg>
+          </div>
+          <h3>Trends, not verdicts</h3>
+          <p>One score means little on its own. Glow keeps your history so you can see the direction it moves across weeks, which is the part that actually tells you something.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="4.6" />
+              <path d="M12 4.1v-1.7M12 21.6v-1.7M19.9 12h1.7M2.4 12h1.7M17.6 6.4l1.2-1.2M5.2 18.8l1.2-1.2M17.6 17.6l1.2 1.2M5.2 5.2l1.2 1.2" />
+            </svg>
+          </div>
+          <h3>It tells you when the light changed</h3>
+          <p>Lighting moves the score. If a scan was taken in a brighter or dimmer room than the last one, Glow says so instead of letting you read it as a change in your skin.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="6.4" y="4.2" width="11.2" height="3.4" rx="1.7" />
+              <rect x="4.8" y="8.2" width="14.4" height="11.6" rx="3.4" />
+            </svg>
+          </div>
+          <h3>A routine built from your scans</h3>
+          <p>Morning and night steps chosen from your own lowest scores and the concerns you picked — product categories, never brands, and never a paid placement.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#38BDF8" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="3.4" y="5.2" width="17.2" height="15.6" rx="3.2" />
+              <path d="M8.2 2.8v4.4M15.8 2.8v4.4M3.4 10.2h17.2" />
+            </svg>
+          </div>
+          <h3>Reminders on your schedule</h3>
+          <p>Pick the time and how often — every day, three times a week, or weekly. The reminder arrives in your own time zone, or not at all if you'd rather.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 3 19.6 6.2c0 8-3.4 13-7.6 14.8C7.8 19.2 4.4 14.2 4.4 6.2z" />
+            </svg>
+          </div>
+          <h3>Your photos stay on your phone</h3>
+          <p>Every scan is analysed on the device and saved in the app's own storage. We never upload your photos, never see them, and have no way to.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works / honesty -->
+  <section class="how-section">
+    <div class="how-inner">
+      <h2 class="how-title">"A tracker, not a verdict."</h2>
+      <p class="how-body">
+        Glow measures your photo, not your skin. There is no trained skin model and no
+        dermatologist behind the number — it is a set of image measurements, computed on
+        your device, that move when your photo moves. That makes it useful for watching
+        change in similar conditions, and a poor way to judge yourself against anyone else.
+        It is not a medical device and cannot detect any condition.
+      </p>
+      <div class="how-grid">
+        <div>
+          <div class="how-number">6</div>
+          <div class="how-label">Measurements per scan</div>
+        </div>
+        <div>
+          <div class="how-number">0</div>
+          <div class="how-label">Photos uploaded</div>
+        </div>
+        <div>
+          <div class="how-number">3</div>
+          <div class="how-label">Days free to try</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section" id="get">
+    <div class="section-label">In testing</div>
+    <h2 class="section-title">Coming soon</h2>
+    <p class="cta-sub">Glow is in beta on TestFlight and Google Play internal testing.<br>Free for your first three days. Premium after that.</p>
+    <div class="cta-buttons">
+      <a href="mailto:support@appvalent.com?subject=Glow%20beta" class="btn-store">
+        <span class="btn-store-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.8" y="4.8" width="18.4" height="14.4" rx="3"/><path d="m3.6 6.6 8.4 6 8.4-6"/></svg></span>
+        <span class="btn-store-text">
+          <span class="btn-store-label">Ask about the</span>
+          <span class="btn-store-name">Beta</span>
+        </span>
+      </a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-brand">Glow</div>
+      <ul class="footer-links">
+        <li><a href="/">Appvalent</a></li>
+        <li><a href="/glow/privacy/">Privacy Policy</a></li>
+        <li><a href="/glow/terms/">Terms of Service</a></li>
+        <li><a href="mailto:support@appvalent.com">Support</a></li>
+      </ul>
+      <div class="footer-copy">© 2026 Appvalent Limited. Glow: Face Score is not a medical device and does not diagnose any condition.</div>
+    </div>
+  </footer>
+
+</body>
+</html>
