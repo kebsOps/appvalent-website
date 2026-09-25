@@ -1,3 +1,5 @@
+/* Shared by every product's legal pages. Each page sets its own accent tokens in an
+   inline :root block before this loads; the defaults below are Glow's. */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
