@@ -76,7 +76,22 @@
         <td>To keep you signed in across devices</td>
         <td>Only if you sign in with Apple or Google</td>
       </tr>
+      <tr>
+        <td><strong>Android only:</strong> a one-way hash of your device's app-scoped Android ID</td>
+        <td>To remember when your free three days started, so reinstalling the app doesn't start them again</td>
+        <td>At launch</td>
+      </tr>
     </table>
+    <p>
+      That last one deserves a plain explanation. Android has no way for an app to ask the
+      Play Store when you first installed it, so the only way to make a free trial mean anything
+      is to remember the device. We take the identifier Android gives us — which is specific to
+      this app and resets if you factory-reset your phone — run it through SHA-256 on the phone,
+      and send only the result. We never receive or store the original, the hash tells us nothing
+      about who or where you are, and the only question it can answer is "has this device started
+      its free days yet". iPhones don't need this: the App Store already tells the app when you
+      first downloaded it.
+    </p>
     <p>
       That is the complete list. The app contains no analytics SDK, no advertising SDK, no
       crash reporting service and no third-party trackers.
