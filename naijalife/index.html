@@ -54,7 +54,7 @@ npcDefs.push(
  {id:'lastma-bisi',name:'Bisi · LASTMA',role:'Traffic officer',uniform:'lastma',junction:0,x:1010,y:640,skin:skinColors[2],outfit:'#e5d6a1',hair:'cropped',gender:'female',zone:[1010,640,1010,640]},
  {id:'lastma-segun',name:'Segun · LASTMA',role:'Traffic officer',uniform:'lastma',junction:1,x:855,y:1120,skin:skinColors[1],outfit:'#e5d6a1',hair:'cropped',gender:'male',zone:[855,1120,855,1120]}
 );
-const initial=()=>({version:2,name:'Tomi',gender:'female',skin:skinColors[1],outfit:outfitColors[0],hair:'natural',x:272,y:450,cash:7500,bank:12000,food:85,energy:90,happy:75,xp:0,day:1,minutes:480,job:'Unemployed',housing:'Family home',vehicle:false,driving:false,shifts:0,totalShifts:0,mealDay:0,questClaimed:false,relations:{},gifts:{}});
+const initial=()=>({version:2,name:'Tomi',gender:'female',skin:skinColors[1],outfit:outfitColors[0],hair:'natural',x:272,y:472,cash:7500,bank:12000,food:85,energy:90,happy:75,xp:0,day:1,minutes:480,job:'Unemployed',housing:'Family home',vehicle:false,driving:false,shifts:0,totalShifts:0,mealDay:0,questClaimed:false,relations:{},gifts:{}});
 let state=initial(),started=false,nearby=null,route=[],target=null,frame=0,last=0,saveElapsed=0,hudElapsed=0,walkPhase=0,wasMoving=false,modalReturn=null,saveWarning=false;
 let width=innerWidth,height=innerHeight,dpr=Math.min(devicePixelRatio||1,2),zoom=1,userZoom=1,camera={x:state.x,y:state.y};
 const keys=new Set(),joy={x:0,y:0,id:null},npcs=npcDefs.map((npc,index)=>({...npc,route:[],wait:index*.7,phase:index}));
@@ -89,7 +89,7 @@ function normalize(data){
  clean.life=cleanLife(data.life);
  clean.room=buildings.some(building=>building.id===data.room)?data.room:null;
  clean.region=['lagos','village','calabar','portharcourt','sokoto','enugu','benue'].includes(data.region)?data.region:'lagos';clean.cargo={produce:Math.floor(clamp(Number(data.cargo?.produce)||0,0,100)),textiles:Math.floor(clamp(Number(data.cargo?.textiles)||0,0,100))};clean.harvestDay=Math.floor(clamp(Number(data.harvestDay)||0,0,clean.day));clean.cultureVisits={};for(const key of ['lagos','village','calabar','portharcourt','sokoto','enugu','benue'])if(data.cultureVisits?.[key]===true)clean.cultureVisits[key]=true;clean.shipments=Array.isArray(data.shipments)?data.shipments.slice(0,20).filter(item=>item&&Number.isFinite(item.due)&&item.due>=0&&Number.isFinite(item.value)&&item.value>0&&item.value<=50000).map(item=>({due:item.due,value:Math.floor(item.value)})):[];
- if(clean.room){clean.driving=false;if(roomBlocked(clean.room,clean.x,clean.y)){clean.x=450;clean.y=590}}else if(outdoorBlocked(clean.x,clean.y)){clean.x=272;clean.y=450}return clean;
+ if(clean.room){clean.driving=false;if(roomBlocked(clean.room,clean.x,clean.y)){clean.x=450;clean.y=590}}else if(outdoorBlocked(clean.x,clean.y)){clean.x=272;clean.y=472}return clean;
 }
 function save(){if(!started)return;try{localStorage.setItem(SAVE_KEY,JSON.stringify(state))}catch{if(!saveWarning){toast('Browser saving is unavailable. Export a save from the menu.');saveWarning=true}}}
 function adjust(food=0,energy=0,happy=0,xp=0){state.food=clamp(state.food+food,0,100);state.energy=clamp(state.energy+energy,0,100);state.happy=clamp(state.happy+happy,0,100);state.xp+=xp}
@@ -433,7 +433,7 @@ function buildScene3D(){
    for(const offset of [-.32,.32])for(const levelY of h>100?[47,98]:[64]){meshBox(buffer,cx+building.w*offset,levelY,building.y+building.h+3,38,28,4,'#dce7d0');meshBox(buffer,cx+building.w*offset,levelY,building.y+building.h+6,29,21,3,'#668d92')}}
    view3D.labels.push({text:building.name,x:cx,y:h+52,z:cz});view3D.labels.push({text:'ENTER ↓',x:building.door.x,y:32,z:building.door.y});meshBox(buffer,building.door.x,3,building.door.y,55,5,30,'#c0e573');meshBox(buffer,cx,25,building.y+building.h+4,30,48,5,'#273c35');meshBox(buffer,cx-21,29,building.y+building.h+6,6,58,8,'#f8edce');meshBox(buffer,cx+21,29,building.y+building.h+6,6,58,8,'#f8edce');
   }
-  treePositions.forEach(([x,z,size],index)=>{if(typeof cityTree3D!=='function')tree3D(buffer,x,z,size);else if(CITY_ARCH[state.region].keep(index))cityTree3D(buffer,x,z,size)});for(const [x,z] of [[480,691],[1390,693],[440,1165],[1500,1185]]){meshBox(buffer,x,17,z,63,8,23,'#a88052');meshBox(buffer,x,32,z-10,63,26,6,'#ad8b5f')}
+  treePositions.forEach(([x,z,size],index)=>{if(typeof placeList==='function'&&placeList().some(p=>Math.hypot(p.x-x,p.z-z)<85))return;if(typeof cityTree3D!=='function')tree3D(buffer,x,z,size);else if(CITY_ARCH[state.region].keep(index))cityTree3D(buffer,x,z,size)});for(const [x,z] of [[480,691],[1390,693],[440,1165],[1500,1185]]){meshBox(buffer,x,17,z,63,8,23,'#a88052');meshBox(buffer,x,32,z-10,63,26,6,'#ad8b5f')}
   car3D(buffer,1180,969,'#ddb16d');car3D(buffer,1650,969,'#dbd5b9');car3D(buffer,773,458,'#7898a1');
   for(const junction of state.region==='village'?[]:junctions)for(const [x,z] of [[851,junction.bottom+17],[1014,junction.top-8]]){meshBox(buffer,x,51,z,6,102,6,'#445f53');meshBox(buffer,x,112,z,25,66,17,'#2e433d')}
  }
@@ -455,7 +455,7 @@ function draw3D(){
  if(!view3D.enabled){view3D.surface.style.display='none';oldRender();return}view3D.surface.style.display='block';const gl=view3D.gl;const pixelRatio=Math.min(devicePixelRatio||1,1.6);if(view3D.surface.width!==Math.floor(width*pixelRatio)||view3D.surface.height!==Math.floor(height*pixelRatio)){view3D.surface.width=Math.floor(width*pixelRatio);view3D.surface.height=Math.floor(height*pixelRatio)}
  if(view3D.scene!==(state.room||'outside')){view3D.focus={x:state.room?450:state.x,z:state.room?435:state.y};buildScene3D()}camera3D();
  const dynamic=[],night=state.minutes>=1140||state.minutes<360;
- if(state.room){const room=roomLayouts[state.room];meshBall(dynamic,room.station.x,2,room.station.y,27,2,17,'#c0e573');if(!['home','apartment'].includes(state.room))person3D(dynamic,{x:450,y:252,gender:'female',skin:skinColors[2],outfit:outfitColors[1],hair:'braids',facing:'down'},0,false)}else{
+ if(state.room){const room=roomLayouts[state.room];meshBall(dynamic,room.station.x,2,room.station.y,27,2,17,'#c0e573');if(!['home','apartment'].includes(state.room))person3D(dynamic,{x:450,y:252,gender:'female',skin:skinColors[2],outfit:outfitColors[1],hair:'braids',facing:'down'},0,false);if(typeof drawGuard3D==='function')drawGuard3D(dynamic)}else{
   if(typeof drawTraffic3D==="function")drawTraffic3D(dynamic);
   for(const npc of npcs)person3D(dynamic,npc,npc.phase,npc.route.length>0&&Math.hypot(state.x-npc.x,state.y-npc.y)>67);
   for(const junction of state.region==='village'?[]:junctions)for(const [x,z] of [[851,junction.bottom+17],[1014,junction.top-8]])for(const [index,color] of ['red','amber','green'].entries())meshBall(dynamic,x,132-index*20,z+11,7,7,4,signalPhase(junction)===color?{red:'#ff715c',amber:'#ffd469',green:'#c0ed6f'}[color]:'#586857');
@@ -538,9 +538,9 @@ function travelMenu(){
  syncRegion();showDialog('EXPLORE NIGERIA','Where next?','<p>Seven connected, stylised hubs: city streets, a village, culture courtyards, airports, and trade routes. Benue is represented by Makurdi. Prices and travel times are game values.</p><div class="badge">Currently in '+region().name+'</div>',Object.entries(regions).map(([id,area])=>({label:area.name+(id===state.region?' · you are here':''),detail:area.subtitle,run:()=>id===state.region?localHubs():travelOptions(id)})));
 }
 function travelOptions(id){const area=regions[id];showDialog('TRAVEL TO '+area.name.toUpperCase(),area.name,'<p>'+area.subtitle+'. Your money, career, home unlock, vehicle, and cargo travel with you. Flights use a simplified regional connection system, not real routes or schedules.</p>',[{label:'Coach · ₦300',detail:'6 game hours · arrive in the neighbourhood',disabled:availableFunds()<300,run:()=>travelTo(id,'coach',300,360)},...(id!=='village'&&state.region!=='village'?[{label:'Flight · ₦1,500',detail:'2 game hours · arrive at the airport',disabled:availableFunds()<1500,run:()=>travelTo(id,'flight',1500,120)}]:[]),{label:'Slow journey · free',detail:'12 game hours · travel without spending money',run:()=>travelTo(id,'coach',0,720)},{label:'Back to destinations',run:travelMenu}])}
-function travelTo(id,mode,cost,minutes){if(!pay(cost))return;closeDialog();state.room=null;state.driving=false;state.region=id;route=[];target=null;portalCooldown=.8;state.x=mode==='flight'?1880:272;state.y=mode==='flight'?150:450;advance(minutes);syncRegion();if(typeof view3D!=='undefined'){view3D.scene=null;view3D.focus={x:state.x,z:state.y}}camera={x:state.x,y:state.y};npcs.forEach((npc,index)=>{npc.x=npcDefs[index].x;npc.y=npcDefs[index].y;npc.route=[]});findNearby();findHubNearby();refresh();save();toast('Welcome to '+region().name+'! Use Travel to find the local landmarks.')}
+function travelTo(id,mode,cost,minutes){if(!pay(cost))return;closeDialog();state.room=null;state.driving=false;state.region=id;route=[];target=null;portalCooldown=.8;state.x=mode==='flight'?1880:272;state.y=mode==='flight'?150:472;advance(minutes);syncRegion();if(typeof view3D!=='undefined'){view3D.scene=null;view3D.focus={x:state.x,z:state.y}}camera={x:state.x,y:state.y};npcs.forEach((npc,index)=>{npc.x=npcDefs[index].x;npc.y=npcDefs[index].y;npc.route=[]});findNearby();findHubNearby();refresh();save();toast('Welcome to '+region().name+'! Use Travel to find the local landmarks.')}
 function walkToHub(hub){closeDialog();if(state.room)leaveRoom();route=findPath(state,hub);target=route.length?{...hub,name:hubName(hub)}:null;refresh();if(!route.length)toast('Move to a clear path, then try again.')}
-function localHubs(){showDialog(region().name.toUpperCase(),'Local landmarks','<p>Walk to a marker, then press E or tap the green button. Cross the river using the bridge in the centre of the southern edge of the map.</p>',[...regionHubs.map(hub=>({label:hubName(hub),detail:hub.id==='culture'?region().craft:hub.id==='trade'?'Buy goods, inspect cargo, and arrange coastal exports':'Transport connections',run:()=>walkToHub(hub)})),{label:region().bridge,detail:'Walk across the river · southern edge',run:()=>{closeDialog();if(state.room)leaveRoom();route=findPath(state,{x:935,y:1315});target=route.length?{name:region().bridge}:null;refresh()}},{label:'Travel to another region',run:travelMenu}])}
+function localHubs(){showDialog(region().name.toUpperCase(),'Local landmarks','<p>Walk to a marker, then press E or tap the green button. Cross the river using the bridge in the centre of the southern edge of the map.</p>',[...regionHubs.map(hub=>({label:hubName(hub),detail:hub.poi?hub.poi.tag:hub.id==='culture'?region().craft:hub.id==='trade'?'Buy goods, inspect cargo, and arrange coastal exports':'Transport connections',run:()=>walkToHub(hub)})),{label:region().bridge,detail:'Walk across the river · southern edge',run:()=>{closeDialog();if(state.room)leaveRoom();route=findPath(state,{x:935,y:1315});target=route.length?{name:region().bridge}:null;refresh()}},{label:'Travel to another region',run:travelMenu}])}
 function openHub(hub){syncRegion();if(hub.id==='airport'||hub.id==='coach'){travelMenu();return}if(hub.id==='culture'){cultureMenu();return}tradeMenu()}
 function cultureMenu(){const area=region();showDialog(area.name.toUpperCase(),'Culture courtyard','<div class="culture-pattern" style="--culture-one:'+area.pattern[0]+';--culture-two:'+area.pattern[1]+'"></div><p>'+area.culture+'</p><p>Meet the guide, browse the displays, and explore the local craft market. Clothing and art here are simplified interpretations, not a complete representation of any community.</p><div class="badge">'+area.craft+'</div>',[{label:state.cultureVisits[state.region]?'Visit the display again':'Meet the guide · +25 XP',detail:'30 game minutes · +10 happiness · XP once per region',run:()=>{const first=!state.cultureVisits[state.region];state.cultureVisits[state.region]=true;advance(30);adjust(0,0,10,first?25:0);closeDialog();toast(first?'New culture courtyard discovered · +25 XP':'You spent time with the displays.')}},{label:'Buy local craft cargo · ₦1,200',detail:'Adds one textile/craft crate for export',disabled:availableFunds()<1200||state.cargo.textiles>=100,run:()=>{if(pay(1200)){state.cargo.textiles++;toast('Craft crate added to your cargo.');cultureMenu()}}},{label:'Other local landmarks',run:localHubs}])}
 function tradeMenu(){const area=region(),coastal=area.coastal;showDialog(area.name.toUpperCase(),coastal?'Export ship port':'Cargo & produce depot','<p>'+(coastal?'Containers, cranes, and cargo ships connect this region to overseas markets. Submit a small export shipment and receive payment in your bank after three game hours.':'Collect goods here, then travel to Lagos, Calabar, or Port Harcourt to export them by ship. This inland depot is not a seaport.')+'</p><div class="stats-grid"><div class="stat-tile">Produce crates<b>'+state.cargo.produce+'</b></div><div class="stat-tile">Craft crates<b>'+state.cargo.textiles+'</b></div><div class="stat-tile">Shipments at sea<b>'+state.shipments.length+'</b></div><div class="stat-tile">Bank balance<b>'+money(state.bank)+'</b></div></div>',[
@@ -673,7 +673,7 @@ function activity(label,minutes,cost,food,energy,happy,income=0){if(state.energy
 let journeyToken=0;
 function journey(mode,destination,arrive){const token=++journeyToken;showDialog('ON THE MOVE',mode+' to '+destination,'<p>You are seated inside. Scenery moves past the window.</p><div class="journey-window"><div class="journey-scenery">🌳　▥　🌳　▥　🌴　▥</div></div><div class="journey-seat"></div><progress class="journey-progress" max="100" value="0" aria-label="Journey progress"></progress><p id="journey-status">Travelling…</p>',[]);const start=performance.now();function step(){if(token!==journeyToken||$('dialog').hidden)return;const progress=Math.min(100,(performance.now()-start)/60),bar=document.querySelector('.journey-progress');if(!bar)return;bar.value=progress;if(progress<100){requestAnimationFrame(step);return}$('journey-status').textContent='Ready to arrive';showDialog('ARRIVAL',destination,'<p>Your journey is complete.</p>',[{label:'Step outside',run:()=>{closeDialog();arrive()}}])}requestAnimationFrame(step)}
 const instantTravel=travelTo;travelTo=function(id,mode,cost,minutes){if(availableFunds()<cost){toast('Not enough pocket cash.');return}journey(mode==='flight'?'Aircraft cabin':'Coach cabin',regions[id].name,()=>instantTravel(id,mode,cost,minutes))};
-const atmosphereRender=render;render=function(){atmosphereRender();if(state.room||!started)return;const north=state.region==='sokoto',rain=!north&&state.day%3===0,time=performance.now()/1000;ctx.save();if(north){ctx.fillStyle='#dcb47720';ctx.fillRect(0,0,width,height);ctx.fillStyle='#c8a57666';for(let index=0;index<45;index++)ctx.fillRect((index*113+time*24)%width,(index*73+Math.sin(time+index)*15)%height,3,2)}else if(rain){ctx.strokeStyle='#a4c8d777';ctx.beginPath();for(let index=0;index<65;index++){const x=(index*101+time*35)%width,y=(index*67+time*220)%height;ctx.moveTo(x,y);ctx.lineTo(x-5,y+13)}ctx.stroke()}ctx.fillStyle='#faf5e3e8';ctx.fillRect(width/2-115,78,230,25);ctx.font='11px system-ui';ctx.textAlign='center';ctx.fillStyle='#23483b';ctx.fillText((north?'Dry-season dust haze':rain?'Passing rain':region().coastal?'Coastal breeze':'Warm, clear skies')+' · simulated',width/2,95);ctx.restore()};
+const atmosphereRender=render;render=function(){atmosphereRender();if(state.room||!started)return;const north=state.region==='sokoto',rain=!north&&state.day%3===0,time=performance.now()/1000;ctx.save();if(north){ctx.fillStyle='#dcb47720';ctx.fillRect(0,0,width,height);ctx.fillStyle='#c8a57666';for(let index=0;index<45;index++)ctx.fillRect((index*113+time*24)%width,(index*73+Math.sin(time+index)*15)%height,3,2)}else if(rain){ctx.strokeStyle='#a4c8d777';ctx.beginPath();for(let index=0;index<65;index++){const x=(index*101+time*35)%width,y=(index*67+time*220)%height;ctx.moveTo(x,y);ctx.lineTo(x-5,y+13)}ctx.stroke()}if(width<700){ctx.restore();return}ctx.fillStyle='#faf5e3e8';ctx.fillRect(width/2-115,78,230,25);ctx.font='11px system-ui';ctx.textAlign='center';ctx.fillStyle='#23483b';ctx.fillText((north?'Dry-season dust haze':rain?'Passing rain':region().coastal?'Coastal breeze':'Warm, clear skies')+' · simulated',width/2,95);ctx.restore()};
 const regionalScene=buildRegion3D;buildRegion3D=function(buffer){regionalScene(buffer);for(const x of [580,1500]){meshBox(buffer,x,45,720,6,90,6,'#665b45');meshBox(buffer,x,105,720,155,58,8,'#315b49');view3D.labels.push({text:life().adUntil>state.day?'LOCAL BUSINESS · '+state.name:state.region==='calabar'?'CARNIVAL · 28 DECEMBER':'CREATE • TRADE • EXPLORE',x,y:120,z:726})}if(state.region==='sokoto'){for(const [x,z,camel] of [[700,760,true],[755,770,false]]){const tone=camel?'#b38a5b':'#8c8171';meshBox(buffer,x,26,z,40,25,20,tone);for(const offset of [-14,14])for(const side of [-7,7])meshBox(buffer,x+offset,10,z+side,5,23,5,tone);meshBox(buffer,x+20,44,z,9,34,10,tone);meshBox(buffer,x+26,60,z,18,12,10,tone);if(camel)meshBall(buffer,x-3,40,z,12,12,9,tone)}view3D.labels.push({text:'MARKET ANIMALS · STYLISED',x:720,y:90,z:765})}};
 life();view3D.scene=null;
 </script>
@@ -738,8 +738,9 @@ function drawFlight(flight){const progress=flight.elapsed/30,phase=progress<.10?
  if(altitude<.8){for(let index=0;index<20;index++){const x=((index*113-drift)%(w+200)+(w+200))%(w+200)-100,buildingHeight=(18+index%5*12)*(1-altitude);context.fillStyle=index%2?'#acb9a9':'#c2c2ab';context.fillRect(x,ground-buildingHeight,30*(1-altitude)+6,buildingHeight)}}
  if(altitude<.45){polygon([[0,ground+30],[w,ground+30],[w,h],[0,h]],'#58656a');context.strokeStyle='#c7c7b3';context.lineWidth=2;context.beginPath();context.moveTo(0,ground+45);context.lineTo(w,ground+45);context.stroke();for(let index=0;index<14;index++){const x=((index*140-drift*5)%(w+160)+(w+160))%(w+160)-100;context.fillStyle='#eee7ce';context.fillRect(x,ground+(h-ground)*.65,65,7);oval(x,ground+48,3,3,'#ffe4a4')}}
  for(let index=0;index<13;index++){const x=((index*191-time*(9+index%3*7))%(w+300)+(w+300))%(w+300)-150,y=h*(.12+(index%4)*(.08+altitude*.09));oval(x,y,70+index%3*20,17+index%3*5,'#f6f5ebc9');oval(x-15,y-12,34,26,'#fbfaf0d9');oval(x+30,y-7,43,22,'#f9f8eed9')}
+ if(typeof flightSceneryHook==='function')flightSceneryHook(context,flight,w,h,ground,altitude,progress);
  if(flight.cabin){const border=Math.min(w*.10,70);context.strokeStyle='#192e3e';context.lineWidth=border*2;context.beginPath();context.roundRect(border/2,border/2,w-border,h-border,Math.min(95,w*.2));context.stroke();context.strokeStyle='#84969e';context.lineWidth=10;context.beginPath();context.roundRect(border+4,border+4,w-border*2-8,h-border*2-8,55);context.stroke();polygon([[w*.25,h*.80],[w*.70,h*.47],[w*.85,h*.50],[w*.49,h*.86]],'#dbe2df');polygon([[w*.70,h*.47],[w*.74,h*.36],[w*.78,h*.37],[w*.77,h*.50]],'#285846');context.strokeStyle='#8da1a5';context.lineWidth=2;context.beginPath();context.moveTo(w*.40,h*.78);context.lineTo(w*.75,h*.5);context.stroke();oval(w*.48,h*.84,w*.08,h*.045,'#617b84');}
- else{const scale=Math.min(w/700,h/400,1.25),planeY=altitude<.45?ground-35:h*.59,bob=phase===3?Math.sin(time*1.7)*3:0;context.save();context.translate(w*.51,planeY+bob);context.scale(scale,scale);context.rotate(phase===2?-.12:phase===4?.06:0);if(altitude<.15)oval(0,63,190,10,'#283c4044');polygon([[-190,0],[-153,-24],[124,-21],[193,-3],[174,15],[-154,18]],'#e9eee5');polygon([[-150,-15],[-172,-86],[-135,-82],[-88,-12]],'#295c4b');polygon([[-68,3],[-117,69],[-67,74],[73,7]],'#9fb9bd');polygon([[-60,-7],[-122,-46],[-70,-44],[76,-7]],'#c5d7d6');polygon([[-178,6],[-191,31],[-143,21],[-118,7]],'#a9beb9');polygon([[123,-20],[148,-16],[158,-7],[128,-7]],'#3d5964');for(let index=0;index<14;index++)oval(-115+index*16,-7,4,4,'#4a6973');context.fillStyle='#36644e';context.fillRect(-147,7,310,4);context.font='bold 13px system-ui';context.fillText('NAIJA AIR',-50,-12);oval(-27,38,40,14,'#dde6de');oval(10,38,8,12,'#405861');if(altitude<.25){for(const x of [-110,117]){context.fillStyle='#66797c';context.fillRect(x,16,4,22);oval(x+2,40,9,9,'#233942')}}context.restore()}
+ else{const scale=Math.min(w/700,h/400,1.25),planeY=altitude<.45?(ground+8)*(1-altitude/.45)+h*.59*(altitude/.45):h*.59,bob=phase===3?Math.sin(time*1.7)*3:0;context.save();context.translate(w*.51,planeY+bob);context.scale(scale,scale);context.rotate(phase===2?-.12:phase===4?.06:0);if(altitude<.15)oval(0,63,190,10,'#283c4044');polygon([[-190,0],[-153,-24],[124,-21],[193,-3],[174,15],[-154,18]],'#e9eee5');polygon([[-150,-15],[-172,-86],[-135,-82],[-88,-12]],'#295c4b');polygon([[-68,3],[-117,69],[-67,74],[73,7]],'#9fb9bd');polygon([[-60,-7],[-122,-46],[-70,-44],[76,-7]],'#c5d7d6');polygon([[-178,6],[-191,31],[-143,21],[-118,7]],'#a9beb9');polygon([[123,-20],[148,-16],[158,-7],[128,-7]],'#3d5964');for(let index=0;index<14;index++)oval(-115+index*16,-7,4,4,'#4a6973');context.fillStyle='#36644e';context.fillRect(-147,7,310,4);context.font='bold 13px system-ui';context.fillText('NAIJA AIR',-50,-12);oval(-27,38,40,14,'#dde6de');oval(10,38,8,12,'#405861');if(altitude<.25){for(const x of [-110,117]){context.fillStyle='#66797c';context.fillRect(x,16,4,22);oval(x+2,40,9,9,'#233942')}}context.restore()}
 }
 $('flight-view').onclick=()=>{if(!activeFlight)return;activeFlight.cabin=!activeFlight.cabin;$('flight-view').textContent=activeFlight.cabin?'Aircraft view':'Cabin view'};
 $('flight-pause').onclick=()=>{if(!activeFlight)return;activeFlight.paused=!activeFlight.paused;$('flight-pause').textContent=activeFlight.paused?'Resume':'Pause'};
@@ -782,7 +783,7 @@ if(['home','apartment'].includes(state.room)&&roomBlocked(state.room,state.x,sta
 </script>
 <script>
 const zoomOut=document.createElement('button');zoomOut.id='zoom-out';zoomOut.textContent='−';zoomOut.setAttribute('aria-label','Zoom out');$('zoom-view').before(zoomOut);$('zoom-view').setAttribute('aria-label','Zoom in');const zoomReset=document.createElement('button');zoomReset.id='zoom-reset';zoomReset.textContent='100%';zoomReset.setAttribute('aria-label','Reset zoom');$('zoom-view').after(zoomReset);
-function setWorldZoom(value){userZoom=clamp(value,.6,2.5);view3D.scale=userZoom;zoomReset.textContent=Math.round(userZoom*100)+'%';zoomOut.disabled=userZoom<=.60001;$('zoom-view').disabled=userZoom>=2.49999}
+function setWorldZoom(value){userZoom=clamp(value,.3,2.5);view3D.scale=userZoom;zoomReset.textContent=Math.round(userZoom*100)+'%';zoomOut.disabled=userZoom<=.30001;$('zoom-view').disabled=userZoom>=2.49999}
 $('zoom-view').onclick=()=>setWorldZoom(userZoom*1.2);zoomOut.onclick=()=>setWorldZoom(userZoom/1.2);zoomReset.onclick=()=>setWorldZoom(1);
 function worldZoomAvailable(){return started&&$('creation').hidden&&$('dialog').hidden&&$('phone-overlay').hidden&&$('flight-screen').hidden&&!document.body.classList.contains('heritage-open')}
 canvas.addEventListener('wheel',event=>{if(!worldZoomAvailable()||event.ctrlKey)return;event.preventDefault();setWorldZoom(userZoom*Math.exp(-clamp(event.deltaY,-100,100)*.002))},{passive:false});
@@ -826,7 +827,7 @@ body{position:fixed;inset:0;overflow:hidden;-webkit-text-size-adjust:100%}
  #hud-right.open>*:not(#hud-toggle):not(.mapbox){display:flex}
  #hud-right.open .camera-tools{display:flex}
  #hud-right .phone-fab{display:flex!important}
- .toast-stack{top:auto;bottom:calc(max(10px,env(safe-area-inset-bottom)) + 86px);width:min(340px,calc(100vw - 24px))}
+ .toast-stack{top:auto;bottom:calc(max(10px,env(safe-area-inset-bottom)) + 156px);width:min(340px,calc(100vw - 24px))}
  .bottom{left:10px;right:10px;bottom:max(10px,env(safe-area-inset-bottom))}
  .location-pill{display:none}
  .bottom{gap:6px}.nav-btn{padding:12px 11px;font-size:11px}.interact{min-width:0;flex:1;padding:12px 10px;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:46px}.interact span{overflow:hidden;text-overflow:ellipsis}
@@ -840,6 +841,20 @@ body{position:fixed;inset:0;overflow:hidden;-webkit-text-size-adjust:100%}
  .toast-stack{top:auto;bottom:66px;width:min(380px,50vw)}
 }
 .modal{max-height:calc(100dvh - 24px);overflow:auto}
+/* Phone: compact HUD, icon buttons, always-visible zoom */
+#zoom-fab{position:fixed;right:max(12px,env(safe-area-inset-right));bottom:calc(max(10px,env(safe-area-inset-bottom)) + 66px);z-index:9;display:none;flex-direction:column;gap:6px}
+#zoom-fab button{width:42px;height:42px;border-radius:14px;background:var(--glass);box-shadow:var(--shadow);font-size:20px;font-weight:700;color:var(--ink);border:1px solid #ffffffa6}
+@media(max-width:700px){
+ #zoom-fab{display:flex}
+ .brand strong{font-size:0}.brand strong::before{content:'n.';font-size:20px;font-weight:800}.brand{padding:8px 12px}
+ .side{width:128px;top:calc(max(10px,env(safe-area-inset-top)) + 56px)}
+ .side .card:first-child{padding:9px 10px}.side .identity{display:none}.side .meter{margin-top:7px}.side .meter-label{font-size:10px}.side .track{height:6px}
+ .bottom .nav-btn{font-size:0;padding:0;width:46px;height:46px;border-radius:14px;display:grid;place-items:center}
+ #explore::before{content:'⌖';font-size:20px}#life::before{content:'☺';font-size:20px}#missions-btn::before{content:'✦';font-size:19px}#ride-btn::before{content:'🚕';font-size:19px}
+ .bottom .interact{min-height:46px;font-size:12px;padding:0 10px}
+ .joystick{width:84px;height:84px;bottom:calc(max(10px,env(safe-area-inset-bottom)) + 64px)}
+ .clock{padding:6px 9px}.clock span{font-size:9px}.clock b{font-size:12px}
+}
 
 </style>
 <!--/ch:layout.css-->
@@ -963,16 +978,16 @@ render=function(){previousRenderMissions();if(!started||state.room||!view3D.enab
 <script>
 /* Traffic: varied vehicles per city that drive in from one edge, cross the map and vanish at the other */
 const TRAFFIC_PROFILES={
- lagos:{mix:{danfo:.28,keke:.14,sedan:.28,suv:.16,okada:.10,truck:.04},speed:1,delay:[.6,5],density:1},
- village:{mix:{okada:.38,keke:.12,truck:.2,cart:.2,sedan:.1},speed:.7,delay:[6,18],density:.35},
- calabar:{mix:{sedan:.32,keke:.28,danfo:.15,suv:.1,okada:.15},speed:.9,delay:[2,8],density:.6},
- portharcourt:{mix:{suv:.28,tanker:.12,truck:.12,sedan:.2,danfo:.18,keke:.1},speed:1,delay:[1,6],density:.8},
- sokoto:{mix:{okada:.34,keke:.2,cart:.2,truck:.12,sedan:.14},speed:.8,delay:[3,10],density:.5},
- enugu:{mix:{sedan:.3,danfo:.2,keke:.2,suv:.15,okada:.15},speed:.9,delay:[2,7],density:.6},
- benue:{mix:{truck:.3,keke:.2,okada:.25,sedan:.15,cart:.1},speed:.85,delay:[3,9],density:.5}
+ lagos:{mix:{danfo:.28,keke:.14,sedan:.28,suv:.16,okada:.10,truck:.04},speed:1,delay:[2.5,9],density:.7},
+ village:{mix:{okada:.38,keke:.12,truck:.2,cart:.2,sedan:.1},speed:.7,delay:[10,26],density:.25},
+ calabar:{mix:{bwtaxi:.36,bwbus:.24,keke:.14,sedan:.08,okada:.1,suv:.08},speed:.9,delay:[4,12],density:.45},
+ portharcourt:{mix:{suv:.28,tanker:.12,truck:.12,sedan:.2,danfo:.18,keke:.1},speed:1,delay:[3,10],density:.6},
+ sokoto:{mix:{okada:.34,keke:.2,cart:.2,truck:.12,sedan:.14},speed:.8,delay:[6,15],density:.35},
+ enugu:{mix:{sedan:.3,danfo:.2,keke:.2,suv:.15,okada:.15},speed:.9,delay:[4,12],density:.45},
+ benue:{mix:{truck:.3,keke:.2,okada:.25,sedan:.15,cart:.1},speed:.85,delay:[6,14],density:.35}
 };
-const KIND_COLORS={sedan:['#e9e0c4','#829eb0','#ba8070','#d9d4cb','#586a60','#a65a4f'],suv:['#2f3a3d','#c9c5b8','#6c7f8c','#7b5f4a'],danfo:['#e8b92f'],keke:['#2f8a4b'],okada:['#c8503c','#3c6a8a','#2b2b2b','#d29a3a'],truck:['#a9553e','#4f7d8a','#c4a24c','#6d7a56'],tanker:['#d9d9cf','#c9cfc2'],cart:['#9a7248']};
-const KIND_SPEED={sedan:[84,112],suv:[80,104],danfo:[70,92],keke:[58,76],okada:[96,128],truck:[55,72],tanker:[50,64],cart:[34,44]};
+const KIND_COLORS={sedan:['#e9e0c4','#829eb0','#ba8070','#d9d4cb','#586a60','#a65a4f'],suv:['#2f3a3d','#c9c5b8','#6c7f8c','#7b5f4a'],danfo:['#e8b92f'],keke:['#2f8a4b'],okada:['#c8503c','#3c6a8a','#2b2b2b','#d29a3a'],truck:['#a9553e','#4f7d8a','#c4a24c','#6d7a56'],tanker:['#d9d9cf','#c9cfc2'],cart:['#9a7248'],bwtaxi:['#2f6fc4'],bwbus:['#f6f6f2']};
+const KIND_SPEED={sedan:[84,112],suv:[80,104],danfo:[70,92],keke:[58,76],okada:[96,128],truck:[55,72],tanker:[50,64],cart:[34,44],bwtaxi:[78,104],bwbus:[66,88]};
 const trafficProfile=()=>TRAFFIC_PROFILES[state.region]||TRAFFIC_PROFILES.lagos;
 const rand=(a,b)=>a+Math.random()*(b-a),pick=list=>list[Math.floor(Math.random()*list.length)];
 function rollVehicle(vehicle){
@@ -1003,8 +1018,10 @@ function vehicle3D(buffer,vehicle){
  const lights=(front,wide=10)=>{box(front,18,-wide,2,6,6,'#fff1be');box(front,18,wide,2,6,6,'#fff1be');box(-front,18,-wide,2,6,5,'#b84a3e');box(-front,18,wide,2,6,5,'#b84a3e')};
  switch(vehicle.kind){
   case 'danfo':car3D(buffer,x,z,color,turn,true);box(0,22,-17,80,3,1,'#2b2b2b');box(0,22,17,80,3,1,'#2b2b2b');box(-4,45,0,48,3,22,'#3b3b36');break;
+  case 'bwbus':car3D(buffer,x,z,'#f6f6f2',turn,true);for(const side of [-17.5,17.5]){box(0,14,side,84,7,1,'#2f6fc4');box(0,27,side,84,3,1,'#2f6fc4')}box(-4,45,0,56,3,31,'#2f6fc4');box(0,8,0,86,4,34,'#2f6fc4');break;
+  case 'bwtaxi':car3D(buffer,x,z,'#2f6fc4',turn,false);box(-3,43,0,37,4,31,'#f6f6f2');for(const side of [-16.8,16.8])box(0,16,side,40,8,1,'#f6f6f2');box(-3,48,0,14,5,8,'#f2c230');break;
   case 'suv':box(0,19,0,70,24,35,color);box(-4,38,0,48,19,31,'#51727c');box(-4,49,0,52,4,33,color);wheels([[-22,-18],[-22,18],[22,-18],[22,18]],15);lights(35,11);box(-34,28,0,2,14,26,'#2b3331');break;
-  case 'keke':box(-6,14,0,40,13,27,'#2f8a4b');box(-6,35,0,42,3,29,'#f2c230');for(const [px,pz] of [[-24,-12],[-24,12],[10,-12],[10,12]])box(px,26,pz,2,24,2,'#2b3331');box(22,14,0,16,13,14,'#f2c230');box(-8,18,0,24,10,22,'#e8dcc0');wheels([[-18,-15],[-18,15]],12);box(26,6,0,10,12,4,'#2f3a37');box(30,16,0,2,5,5,'#fff1be');break;
+  case 'keke':box(-6,14,0,40,13,27,state.region==='calabar'?'#2f6fc4':'#2f8a4b');box(-6,35,0,42,3,29,state.region==='calabar'?'#f6f6f2':'#f2c230');for(const [px,pz] of [[-24,-12],[-24,12],[10,-12],[10,12]])box(px,26,pz,2,24,2,'#2b3331');box(22,14,0,16,13,14,'#f2c230');box(-8,18,0,24,10,22,'#e8dcc0');wheels([[-18,-15],[-18,15]],12);box(26,6,0,10,12,4,'#2f3a37');box(30,16,0,2,5,5,'#fff1be');break;
   case 'okada':box(0,12,0,34,6,7,color);box(-10,18,0,16,5,9,'#2b2b2b');box(18,10,0,12,17,3,'#2f3a37');box(-18,10,0,14,17,3,'#2f3a37');box(14,22,0,3,14,3,'#555');box(-4,31,0,10,18,12,'#35557d');ball(-3,47,0,6,6,6,'#d7b393');ball(-3,50,0,7,5,7,pick(['#222','#c8503c','#e9d09a']));box(-14,29,0,10,16,11,'#a8825f');break;
   case 'truck':box(24,23,0,30,30,36,color);box(32,34,0,12,13,32,'#567a80');box(-10,15,0,66,8,36,'#8d6b4a');box(-10,24,-17,66,10,2,'#7a5b3d');box(-10,24,17,66,10,2,'#7a5b3d');for(let i=0;i<3;i++)box(-24+i*18,32,0,14,12,14,['#d7a65a','#8aa65a','#c36b4a'][i]);wheels([[-24,-18],[-24,18],[24,-18],[24,18]],16);lights(40,12);break;
   case 'tanker':box(30,24,0,26,30,34,color);box(36,34,0,10,12,30,'#567a80');ball(-12,32,0,48,19,19,'#d9d9cf');box(-12,10,0,90,7,30,'#4a5550');wheels([[-40,-17],[-40,17],[-20,-17],[-20,17],[30,-17],[30,17]],14);box(-12,52,0,40,3,3,'#a8a493');break;
@@ -1015,7 +1032,7 @@ function vehicle3D(buffer,vehicle){
 function drawTraffic3D(buffer){for(const vehicle of traffic)if(!vehicle.hidden)vehicle3D(buffer,vehicle)}
 /* minimap + big map dots */
 const previousMinimap=drawMinimap;
-drawMinimap=function(){previousMinimap();if(state.room)return;const sx=332/WORLD.w,sy=216/WORLD.h;for(const vehicle of traffic){if(vehicle.hidden)continue;mini.fillStyle={danfo:'#e8b92f',keke:'#2f8a4b',okada:'#c8503c',truck:'#a9553e',tanker:'#8c9288',cart:'#9a7248'}[vehicle.kind]||'#47606a';mini.fillRect(vehicle.x*sx-2.5,vehicle.y*sy-1.5,vehicle.kind==='okada'?3:5,3)}};
+drawMinimap=function(){previousMinimap();if(state.room)return;const sx=332/WORLD.w,sy=216/WORLD.h;for(const vehicle of traffic){if(vehicle.hidden)continue;mini.fillStyle={bwbus:'#2f6fc4',bwtaxi:'#2f6fc4',danfo:'#e8b92f',keke:'#2f8a4b',okada:'#c8503c',truck:'#a9553e',tanker:'#8c9288',cart:'#9a7248'}[vehicle.kind]||'#47606a';mini.fillRect(vehicle.x*sx-2.5,vehicle.y*sy-1.5,vehicle.kind==='okada'?3:5,3)}};
 
 </script>
 <!--/ch:traffic.js-->
@@ -1052,7 +1069,9 @@ const previousSyncCast=syncRegion;syncRegion=function(){previousSyncCast();if(ca
 const previousBuildRegion=buildRegion3D;
 buildRegion3D=function(buffer){previousBuildRegion(buffer);const id=state.region;
  const tower=(x,z,w,h,body,glass='#7fa3ad')=>{meshBox(buffer,x,h/2,z,w,h,w,body);for(let level=18;level<h-8;level+=16)meshBox(buffer,x,level,z+w/2+.5,w-8,5,1,glass)};
- if(id==='lagos'){for(const [x,w,h,c] of [[160,50,170,'#c8b79a'],[260,44,230,'#a9b9bd'],[360,52,150,'#d1bc98'],[1180,48,210,'#a7b5b8'],[1290,54,260,'#c5ad8a'],[1410,46,160,'#b8c4c1'],[1500,50,190,'#cdb994']])tower(x,-45,w,h,c);meshBox(buffer,700,50,-30,160,60,10,'#e9d692');view3D.labels.push({text:'LAGOS ISLAND SKYLINE',x:760,y:130,z:-30})}
+ if(id==='lagos'){const dist=state.district||'mainland';if(dist==='mainland'){for(const [x,w,h,c] of [[160,50,170,'#c8b79a'],[260,44,230,'#a9b9bd'],[360,52,150,'#d1bc98'],[1180,48,210,'#a7b5b8'],[1290,54,260,'#c5ad8a'],[1410,46,160,'#b8c4c1'],[1500,50,190,'#cdb994']])tower(x,-45,w,h,c);for(let i=0;i<14;i++)meshBox(buffer,300+i*90,22,-20,8,44,8,i%2?'#8b979b':'#7a8a8e');view3D.labels.push({text:'THIRD MAINLAND BRIDGE',x:900,y:90,z:-20})}
+ else if(dist==='island'){for(let i=0;i<11;i++)tower(120+i*165,-48,46+(i%3)*8,170+(i*37%120),['#d6c9a8','#a9b9bd','#cbb99a'][i%3]);view3D.labels.push({text:'LAGOS ISLAND · MARINA',x:760,y:130,z:-30})}
+ else{for(let i=0;i<9;i++)tower(160+i*200,-52,48,190+(i*53%140),'#9dbfc9','#e8f3f7');meshBox(buffer,1000,30,-110,900,60,50,'#6fa7c2');view3D.labels.push({text:'EKO ATLANTIC · VICTORIA ISLAND',x:900,y:150,z:-52})}}
  else if(id==='village'){for(const [x,z] of [[120,40],[240,70],[420,45],[1250,50],[1450,80],[1600,40]]){meshBox(buffer,x,18,z,38,36,38,'#b5865f');meshRoof(buffer,x,36,z,52,30,52,'#c9b36a')}meshBox(buffer,800,32,40,38,64,38,'#a58360');meshBall(buffer,800,74,40,32,18,32,'#c9b36a');for(const x of [680,930,1020])meshBox(buffer,x,5,90,60,3,4,'#8a643f')}
  else if(id==='calabar'){meshBox(buffer,700,26,28,340,52,60,'#efe6d0');for(let x=550;x<=850;x+=30)meshBox(buffer,x,18,64,5,36,5,'#f9f3df');meshRoof(buffer,700,52,28,360,24,70,'#9b5b4a');for(const [x,c] of [[1200,'#c94f4f'],[1230,'#f0c040'],[1260,'#3f8e5b'],[1290,'#3d6fb0']])meshBox(buffer,x,50,40,26,100,6,c);view3D.labels.push({text:'Museum row',x:700,y:100,z:28})}
  else if(id==='portharcourt'){for(const x of [300,360,420,480])meshBall(buffer,x,26,40,26,26,26,'#d9d9cf');meshBox(buffer,1500,80,40,6,160,6,'#5c6663');meshBall(buffer,1500,172,40,10,16,10,'#ff9d3a');meshBox(buffer,1700,80,60,6,160,6,'#5c6663');meshBall(buffer,1700,172,60,10,16,10,'#ff7a2b');for(const x of [900,960,1020])meshBox(buffer,x,38,35,6,76,6,'#d4ac61')}
@@ -1138,7 +1157,7 @@ button:focus-visible{outline-offset:2px}
 <!--ch:map.js-->
 <script>
 /* Map app: live traffic, residents and mission givers */
-const KIND_MAP_COLOR={danfo:'#e8b92f',keke:'#2f8a4b',okada:'#c8503c',truck:'#a9553e',tanker:'#8c9288',cart:'#9a7248',suv:'#2f3a3d',sedan:'#47606a'};
+const KIND_MAP_COLOR={bwbus:'#2f6fc4',bwtaxi:'#2f6fc4',danfo:'#e8b92f',keke:'#2f8a4b',okada:'#c8503c',truck:'#a9553e',tanker:'#8c9288',cart:'#9a7248',suv:'#2f3a3d',sedan:'#47606a'};
 function paintLiveMap(){
  const map=document.querySelector('.city-map');if(!map)return;const ns='http://www.w3.org/2000/svg';let live=map.querySelector('#map-live');
  if(!live){live=document.createElementNS(ns,'g');live.id='map-live';map.append(live)}
@@ -1162,29 +1181,29 @@ const legend=document.createElement('style');legend.textContent='.map-legend::af
 <script>
 /* Real-city architecture: each region builds in its own idiom, with fewer, better-spaced props */
 const CITY_ARCH={
- lagos:{scale:1,trees:'palm',keep:()=>true},
- village:{scale:.84,trees:'leafy',keep:i=>i%3!==1},
- calabar:{scale:.94,trees:'palm',keep:i=>i%3!==1},
- portharcourt:{scale:1,trees:'palm',keep:i=>i%2===0},
- sokoto:{scale:.92,trees:'acacia',keep:i=>i%2===0},
- enugu:{scale:.95,trees:'leafy',keep:i=>i%3!==1},
- benue:{scale:.88,trees:'baobab',keep:i=>i%2===0}
+ lagos:{scale:.8,trees:'palm',keep:()=>true},
+ village:{scale:.68,trees:'leafy',keep:i=>i%3!==1},
+ calabar:{scale:.78,trees:'palm',keep:i=>i%3!==1},
+ portharcourt:{scale:.82,trees:'palm',keep:i=>i%2===0},
+ sokoto:{scale:.76,trees:'acacia',keep:i=>i%2===0},
+ enugu:{scale:.78,trees:'leafy',keep:i=>i%3!==1},
+ benue:{scale:.72,trees:'baobab',keep:i=>i%2===0}
 };
 function archBuilding3D(buffer,b,cx,cz){
  const id=state.region,style=CITY_ARCH[id]||CITY_ARCH.lagos,zf=b.y+b.h,s=style.scale,w=b.w*s,d=b.h*s,zc=zf-d/2,big=b.id==='office'||b.id==='apartment';
  const box=(x,y,z,W,H,D,c)=>meshBox(buffer,x,y,z,W,H,D,c),roof=(x,y,z,W,H,D,c)=>meshRoof(buffer,x,y,z,W,H,D,c);
- const front=zf-(b.h-d)/2*0; // facade plane stays at the original front so doors line up
+ const dist=state.district||'mainland',bc=id==='lagos'&&dist==='vi'?'#a8c5cf':id==='lagos'&&dist==='island'?['#d6c9a8','#cbb99a','#bfae8f'][(b.x/60|0)%3]:b.color; // facade plane stays at the original front so doors line up
  const fz=zf;let h=92;
  const windowGrid=(rows,color,frame,cols=2,ww=34,wh=24)=>{for(const lv of rows)for(let c=0;c<cols;c++){const x=cx+(c-(cols-1)/2)*(w*.62/Math.max(1,cols-1||1));box(x,lv,fz+3,ww+8,wh+8,3,frame);box(x,lv,fz+5,ww,wh,2,color)}};
  const signBand=(color,y=57)=>box(cx,y,fz+2,w-26,20,4,color);
  const veranda=(floor,post,cols,y=56)=>{box(cx,5,fz+10,w-16,3,16,floor);for(let i=0;i<cols;i++)box(cx-(w-30)/2+i*(w-30)/(cols-1),y/2,fz+16,5,y,5,post);box(cx,y+2,fz+10,w-6,4,20,'#8a4b3a')};
  if(id==='lagos'){
-  if(big){h=b.id==='office'?150:128;box(cx,h/2,zc,w,h,d,b.color);for(let lv=36;lv<h-8;lv+=20)box(cx,lv,fz+1,w-16,11,2,'#5f8f9c');box(cx,h+3,zc,w+4,6,d+4,'#8d9a96');box(cx+w*.26,h+17,zc,26,22,26,'#2d6f9a');box(cx-w*.3,h+34,zc,2,56,2,'#55605c');signBand('#f2e6c0',22)}
-  else if(b.id==='home'){h=72;box(cx,h/2,zc,w,h,d,b.color);roof(cx,h,zc,w+16,26,d+16,'#8f9ea3');for(let i=0;i<9;i++)box(cx-w*.42+i*w*.105,h+10,zc,2,3,d+14,'#a9b6ba');veranda('#bfae8c','#efe4c9',5,52);windowGrid([44],'#668d92','#dce7d0',2);box(cx+w*.3,h+14,zc,14,2,14,'#e7e7e0')}
-  else if(b.id==='restaurant'){h=84;box(cx,h/2,zc,w,h,d,b.color);box(cx,h+3,zc,w+6,6,d+6,'#7a5846');for(let i=0;i<10;i++)box(cx-w/2+8+i*(w-16)/9,56,fz+12,(w-16)/9,3,20,i%2?'#d84b3a':'#f1c24a');signBand('#fbe9a8',70);for(let i=0;i<3;i++)box(cx-w*.3+i*w*.3,14,fz+24,14,22,14,'#d98b43')}
-  else if(b.id==='shop'){h=70;box(cx,h/2,zc,w,h,d,b.color);box(cx,h+3,zc,w+6,6,d+6,'#6f6a55');for(let i=0;i<8;i++)box(cx-w/2+10+i*(w-20)/7,50,fz+12,(w-20)/7,3,18,i%2?'#3d6fb0':'#f4f1e6');for(let i=0;i<4;i++)box(cx-w*.35+i*18,8,fz+26,14,16,14,['#d7a65a','#c36b4a','#8aa65a','#6a8caf'][i])}
-  else if(b.id==='bank'){h=100;box(cx,h/2,zc,w,h,d,b.color);box(cx,h+3,zc,w+6,6,d+6,'#6a8a78');for(let i=0;i<6;i++)box(cx-w*.4+i*w*.16,45,fz+14,9,90,9,'#f2ecd9');roof(cx,92,fz+14,w*.9,22,18,'#e8e1c8');box(cx,4,fz+24,w*.9,4,12,'#d6d0bd')}
-  else if(b.id==='dealer'){h=78;box(cx,h/2,zc,w,h,d,b.color);box(cx,34,fz+2,w-22,50,3,'#7fb0bd');box(cx,h+3,zc,w+26,6,d+20,'#586e78');for(let i=0;i<9;i++)box(cx-w*.42+i*w*.105,h+16,fz+4,10,14,1,i%2?'#e8b92f':'#c8503c');box(cx,h+8,fz+8,w*.9,2,1,'#d9d3bd')}
+  if(big){h=(b.id==='office'?150:128)+(dist==='island'?40:dist==='vi'?24:0);box(cx,h/2,zc,w,h,d,bc);for(let lv=36;lv<h-8;lv+=20)box(cx,lv,fz+1,w-16,11,2,'#5f8f9c');box(cx,h+3,zc,w+4,6,d+4,'#8d9a96');box(cx+w*.26,h+17,zc,26,22,26,'#2d6f9a');box(cx-w*.3,h+34,zc,2,56,2,'#55605c');signBand('#f2e6c0',22)}
+  else if(b.id==='home'){h=72;box(cx,h/2,zc,w,h,d,bc);roof(cx,h,zc,w+16,26,d+16,'#8f9ea3');for(let i=0;i<9;i++)box(cx-w*.42+i*w*.105,h+10,zc,2,3,d+14,'#a9b6ba');veranda('#bfae8c','#efe4c9',5,52);windowGrid([44],'#668d92','#dce7d0',2);box(cx+w*.3,h+14,zc,14,2,14,'#e7e7e0')}
+  else if(b.id==='restaurant'){h=84;box(cx,h/2,zc,w,h,d,bc);box(cx,h+3,zc,w+6,6,d+6,'#7a5846');for(let i=0;i<10;i++)box(cx-w/2+8+i*(w-16)/9,56,fz+12,(w-16)/9,3,20,i%2?'#d84b3a':'#f1c24a');signBand('#fbe9a8',70);for(let i=0;i<3;i++)box(cx-w*.3+i*w*.3,14,fz+24,14,22,14,'#d98b43')}
+  else if(b.id==='shop'){h=70;box(cx,h/2,zc,w,h,d,bc);box(cx,h+3,zc,w+6,6,d+6,'#6f6a55');for(let i=0;i<8;i++)box(cx-w/2+10+i*(w-20)/7,50,fz+12,(w-20)/7,3,18,i%2?'#3d6fb0':'#f4f1e6');for(let i=0;i<4;i++)box(cx-w*.35+i*18,8,fz+26,14,16,14,['#d7a65a','#c36b4a','#8aa65a','#6a8caf'][i])}
+  else if(b.id==='bank'){h=100;box(cx,h/2,zc,w,h,d,bc);box(cx,h+3,zc,w+6,6,d+6,'#6a8a78');for(let i=0;i<6;i++)box(cx-w*.4+i*w*.16,45,fz+14,9,90,9,'#f2ecd9');roof(cx,92,fz+14,w*.9,22,18,'#e8e1c8');box(cx,4,fz+24,w*.9,4,12,'#d6d0bd')}
+  else if(b.id==='dealer'){h=78;box(cx,h/2,zc,w,h,d,bc);box(cx,34,fz+2,w-22,50,3,'#7fb0bd');box(cx,h+3,zc,w+26,6,d+20,'#586e78');for(let i=0;i<9;i++)box(cx-w*.42+i*w*.105,h+16,fz+4,10,14,1,i%2?'#e8b92f':'#c8503c');box(cx,h+8,fz+8,w*.9,2,1,'#d9d3bd')}
   else{h=96;box(cx,h/2,zc,w,h,d,'#5d4d72');box(cx,h+3,zc,w+6,6,d+6,'#2f2740');box(cx,h-14,fz+3,w-12,3,2,'#ff5fd0');box(cx,h-26,fz+3,w-12,3,2,'#59e0f0');for(const x of [-.38,.38])box(cx+w*x,24,fz+14,16,48,14,'#241d30')}
  }else if(id==='calabar'){
   h=big?118:88;const wall='#efe6d1';box(cx,h/2,zc,w,h,d,wall);roof(cx,h,zc,w+18,big?40:34,d+18,'#a4533f');veranda('#d8cdb2','#fbf6e7',big?7:6,58);
@@ -1233,12 +1252,26 @@ let NAIJA_ADS=(typeof window!=='undefined'&&Array.isArray(window.NAIJA_ADS)&&win
  {brand:'ADVERTISE HERE',tagline:'Put your brand on Naija Life',bg:'#fffaf0',fg:'#163b32',accent:'#d9531e',link:'https://appvalent.com/naijalife/'}
 ]);
 fetch('ads.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(data=>{const list=Array.isArray(data)?data:data?.ads;if(Array.isArray(list)&&list.length){NAIJA_ADS=list.filter(ad=>ad&&typeof ad.brand==='string').slice(0,60).map(ad=>({brand:String(ad.brand).slice(0,16),tagline:String(ad.tagline||'').slice(0,34),bg:/^#[0-9a-f]{6}$/i.test(ad.bg)?ad.bg:'#163b32',fg:/^#[0-9a-f]{6}$/i.test(ad.fg)?ad.fg:'#ffffff',accent:/^#[0-9a-f]{6}$/i.test(ad.accent)?ad.accent:'#c0e573',link:/^https:\/\//.test(ad.link||'')?ad.link:'',cities:Array.isArray(ad.cities)?ad.cities:null}));if(typeof view3D!=='undefined')view3D.scene=null}}).catch(()=>{});
-const BILLBOARD_SLOTS={default:[['roof','office'],['roof','bank'],['roof','dealer'],['roof','club'],['roof','apartment'],['road',760,1112],['road',1230,1112],['road',270,1108]],village:[['roof','dealer'],['road',760,1112],['road',1230,1112]],benue:[['roof','office'],['roof','dealer'],['roof','bank'],['road',760,1112],['road',1230,1112]]};
+const BILLBOARD_SLOTS={default:[['roof','office'],['roof','bank'],['roof','dealer'],['roof','club'],['roof','apartment'],['road',210,118,125],['road',1650,118,125]],village:[['roof','dealer'],['road',210,118,125],['road',1650,118,125]],benue:[['roof','office'],['roof','dealer'],['roof','bank'],['road',210,118,125],['road',1650,118,125]]};
 const slotsFor=()=>BILLBOARD_SLOTS[state.region]||BILLBOARD_SLOTS.default;
 const rooftopAdFor=b=>slotsFor().some(slot=>slot[0]==='roof'&&slot[1]===b.id);
+const CITY_ADS={
+ 'lagos-mainland':[['Danfo FM','Yaba traffic, music and gist','#f4c430','#1e2a1e'],['Ikeja Gadgets','Phones fixed while you wait','#201c3a','#9ae6ff'],['Mainland Suya','Pepper that talks back','#8d2f25','#ffe6b0'],['Surulere Football','Match day every weekend','#1f6f4a','#ffffff'],['EkoPay','Send money in seconds','#163b32','#c0e573']],
+ 'lagos-island':[['Marina Cargo','Ships, ferries, deadlines','#27465a','#f0e7c8'],['Balogun Fabrics','Ankara by the yard','#c24a62','#fff6df'],['Broad Street Bank','Island banking, done right','#14372e','#c0e573'],['Idumota Traders','Wholesale since forever','#d9531e','#fff6df'],['Eko Ferry','Cross the lagoon in 20 min','#2f6fc4','#ffffff']],
+ 'lagos-vi':[['Lekki Beach Club','Sunset, sand, sound','#ff7ad9','#201c3a'],['VI Towers','Offices with a view','#27465a','#9ae6ff'],['Atlantic Homes','Live on the ocean','#2f6d54','#f6f1da'],['Eko Spa','Breathe. Unwind. Repeat','#7ec0d4','#14372e'],['Island Motors','Drive the Lekki dream','#201c3a','#e8b92f']],
+ portharcourt:[['Garden City Realty','Homes in the Garden City','#2f6d54','#f6f1da'],['Bonny Ferries','Fast boats every hour','#2f6fc4','#ffffff'],['Delta Offshore','Powering the Niger Delta','#27465a','#ffd24a'],['Pepper-Soup Hub','Hot enough to wake you up','#b3122b','#fff6df'],['Rivers Polo Cup','Match day at the Polo Club','#14372e','#c0e573']],
+ calabar:[['Carnival Calabar','Africa’s biggest street party','#c94f4f','#ffe36a'],['Creek Cruises','See the river your way','#2f6fc4','#ffffff'],['Afang Kitchen','Soup like grandma made','#2f6d54','#ffe36a'],['Tinapa Deals','Shop. Eat. Laugh.','#3d6fb0','#ffffff'],['Calabar Cabs','Blue and white. Always close','#2f6fc4','#ffffff']],
+ sokoto:[['Sokoto Leather','Red leather, made to last','#a96d49','#f3e6c8'],['Savannah Dates','Sweet from the north','#c98a62','#fff6df'],['Rima Water','Pure from the river','#4f87a0','#ffffff'],['Northern Grain','Millet, maize, guinea corn','#d6b980','#3a2c24'],['Kasuwa Radio','The market talks here','#3a2c24','#f3e6c8']],
+ enugu:[['Coal City Bakery','Warm bread on the hill','#a15346','#fff6df'],['Hilltop Mobile','Better signal, better hill','#201c3a','#9ae6ff'],['Nike Lake Resort','Weekend by the water','#2f6d54','#f6f1da'],['Ogbete Fresh','Everything, fresh daily','#6aa05b','#ffffff'],['Polo Park Mall','Shop the hill city','#27465a','#e8b92f']],
+ benue:[['Benue Yam Co.','The food basket delivers','#6aa05b','#fffbe8'],['Harvest Seeds','Plant today, eat tomorrow','#cfa95a','#3a2c24'],['River Fisheries','Fresh from the Benue','#2f6fc4','#ffffff'],['Makurdi Cloth','Stripes with stories','#2e3330','#f0e8d5'],['Valley Tractors','Plough faster','#bc554b','#fff6df']],
+ village:[['Farm Coop','Better price for your harvest','#6aa05b','#fffbe8'],['Village Radio','News, songs and market prices','#aa673e','#fff6df'],['Bright Seeds','Bigger harvests','#cfa95a','#3a2c24']]
+};
 function adForSlot(index){
  const mine=state.myAd&&state.myAd.until>=state.day&&index===0?state.myAd:null;if(mine)return {brand:mine.brand,tagline:mine.tagline,bg:'#1b1b1b',fg:'#ffd24a',accent:'#ffd24a',mine:true};
- const pool=NAIJA_ADS.filter(ad=>!ad.cities||ad.cities.includes(state.region));const list=pool.length?pool:NAIJA_ADS;const offset=[...state.region].reduce((sum,ch)=>sum+ch.charCodeAt(0),0);return list[(index+offset)%list.length];
+ const local=CITY_ADS[styleKey()]||CITY_ADS.lagos&&CITY_ADS['lagos-mainland'];
+ const sponsor=index===1||index===5;
+ if(!sponsor&&local){const [brand,tagline,bg,fg]=local[(index-(index>1?1:0)-(index>5?1:0))%local.length];return {brand,tagline,bg,fg,accent:fg,local:true}}
+ const pool=NAIJA_ADS.filter(ad=>!ad.cities||ad.cities.includes(state.region));const list=pool.length?pool:NAIJA_ADS;return list[Math.floor(index/2)%list.length];
 }
 function voxelText(buffer,text,cx,cy,z,maxWidth,maxP,color){
  text=String(text).toUpperCase().replace(/[^A-Z0-9 .,!'?:&+\/%₦-]/g,'');const n=text.length;if(!n)return 0;const p=Math.min(maxP,maxWidth/(n*6-1)),width=(n*6-1)*p;let x0=cx-width/2;
@@ -1260,14 +1293,14 @@ buildRegion3D=function(buffer){
  previousBuildRegionAds(buffer);let index=0;
  for(const slot of slotsFor()){const ad=adForSlot(index);index++;
   if(slot[0]==='roof'){const b=buildings.find(item=>item.id===slot[1]);if(!b)continue;const cx=b.x+b.w/2,cz=b.y+b.h/2,top=(b.archH||92)+(['calabar','enugu','benue','village'].includes(state.region)?48:22);billboard3D(buffer,cx,cz-8,top,Math.min(230,b.w-20),88,ad,true)}
-  else billboard3D(buffer,slot[1],slot[2],54,250,104,ad,false)}
+  else billboard3D(buffer,slot[1],slot[2],slot[3]||54,250,104,ad,false)}
 };
 /* Advertise dialog */
 function billboardList(){return slotsFor().map((slot,index)=>({slot,index,ad:adForSlot(index)}))}
 function advertiseDialog(){
  const rows=billboardList().map(({index,ad})=>'<div class="mission-row"><b>'+(ad.mine?'★ ':'')+ad.brand+'</b><span>'+ad.tagline+'</span>'+(ad.link?'<small><a href="'+ad.link+'" target="_blank" rel="noopener noreferrer">'+ad.link.replace('https://','')+'</a></small>':'')+'</div>').join('');
  const mine=state.myAd&&state.myAd.until>=state.day;
- showDialog('BILLBOARDS · '+region().name.toUpperCase(),'Advertise in the game','<p>Billboards across '+region().name+' show real advertisers. Companies are added by editing <code>ads.json</code> next to the game; see the project README. You can also rent the first board for your own brand.</p><div class="mission-log">'+rows+'</div>'+(mine?'<div class="badge">Your board: '+state.myAd.brand+' · until day '+state.myAd.until+'</div>':''),[
+ showDialog('BILLBOARDS · '+region().name.toUpperCase(),'Advertise in the game','<p>Billboards in '+region().name+' mix local brands with sponsors. Companies are added by editing <code>ads.json</code> next to the game; see the project README. You can also rent the first board for your own brand.</p><div class="mission-log">'+rows+'</div>'+(mine?'<div class="badge">Your board: '+state.myAd.brand+' · until day '+state.myAd.until+'</div>':''),[
   {label:mine?'Change my billboard · ₦5,000':'Rent a billboard for 7 days · ₦5,000',detail:'Your brand and one line of text on the first board in every city',disabled:availableFunds()<5000,run:()=>{
    const brand=(prompt('Brand name (max 14 characters)',state.myAd?.brand||state.name)||'').trim().slice(0,14),tagline=(prompt('One line (max 28 characters)',state.myAd?.tagline||'Proudly Naija')||'').trim().slice(0,28);if(!brand)return;if(!pay(5000,'Billboard rental'))return;state.myAd={brand,tagline,until:state.day+7};view3D.scene=null;save();toast('Billboard live for 7 days: '+brand);closeDialog()}},
   {label:'Close',run:closeDialog}]);
@@ -1343,6 +1376,11 @@ function drawTerminal(context,x,base,scale,id,showName){
  if(showName){const label=airport.name.toUpperCase();context.font='bold 17px system-ui';const tw=context.measureText(label).width+34;rect(40-tw/2,-188,tw,34,'#14372e');rect(40-tw/2,-190,tw,3,'#c0e573');context.fillStyle='#f6f1da';context.textAlign='center';context.fillText(label,40,-165);rect(36,-154,8,30,'#6c7c80')}
  context.restore();
 }
+function flightSceneryHook(context,flight,w,h,ground,altitude,progress){
+ const sc0=Math.min(1,w/900)*Math.max(.2,1-altitude*.9),base=ground+26;
+ if(progress<.42){const away=Math.max(0,(progress-.23)/.17);drawTerminal(context,w*.30-away*w*1.1,base,sc0*(1-away*.4),flight.origin,progress<.30)}
+ if(progress>.80){const ease=Math.min(1,Math.max(0,(progress-.80)/.17)),x=w*1.5-(w*1.5-w*.30)*(1-Math.pow(1-ease,3));drawTerminal(context,x,base,sc0*(.6+.4*ease),flight.id,true)}
+}
 const previousDrawFlight=drawFlight;
 drawFlight=function(flight){
  previousDrawFlight(flight);
@@ -1351,10 +1389,6 @@ drawFlight=function(flight){
  const surface=$('flight-canvas'),bounds=surface.getBoundingClientRect(),ratio=Math.min(devicePixelRatio||1,2),context=surface.getContext('2d'),w=bounds.width,h=bounds.height,ground=h*(.55+altitude*.6);
  context.setTransform(ratio,0,0,ratio,0,0);
  const origin=AIRPORTS[flight.origin]||AIRPORTS.lagos,dest=AIRPORTS[flight.id]||AIRPORTS.lagos,sc0=Math.min(1,w/900)*Math.max(.2,1-altitude*.9);
- // departure airport: static while boarding/taxiing, slides away on take-off
- if(progress<.42){const away=Math.max(0,(progress-.23)/.17);drawTerminal(context,w*.30-away*w*1.1,ground+30,sc0*(1-away*.4),flight.origin,progress<.30)}
- // arrival airport: slides in during the approach, stops at the gate
- if(progress>.80){const ease=Math.min(1,Math.max(0,(progress-.80)/.17)),x=w*1.5-(w*1.5-w*.34)*(1-Math.pow(1-ease,3));drawTerminal(context,x,ground+30,sc0*(.6+.4*ease),flight.id,true)}
  if(flight.cabin&&(progress<.42||progress>.8)){/* cabin frame already drawn above the scenery in original; keep scenery readable */}
  // captions
  if(phase===0)$('flight-detail').textContent='BOARDING · '+origin.name.toUpperCase();
@@ -1366,5 +1400,293 @@ drawFlight=function(flight){
 
 </script>
 <!--/ch:flightfx.js-->
+<!--ch:places.js-->
+<script>
+/* Real-city venues: suya spots, spas, hotels, golf, polo, markets, ferries... plus Lagos districts */
+const styleKey=()=>state.region==='lagos'?'lagos-'+(state.district||'mainland'):state.region;
+const SLOT={B1:[640,1150],B2:[745,1150],B3:[1110,1150],B4:[1230,1150],B5:[1350,1150],T2:[500,122],T3:[1200,122],R:[1260,1214],G1:[495,300],G2:[1420,300],G3:[495,800],G4:[1420,800],L1:[85,310],L2:[85,800],R1:[1920,330],R2:[1920,800]};
+/* kind sizes [w,d] */
+const KIND_SIZE={suya:[84,46],spa:[92,54],hotel:[116,64],mall:[112,58],market:[104,52],museum:[104,56],golf:[270,80],polo:[270,80],park:[240,80],beach:[200,70],stadium:[130,72],landmark:[96,52],ferry:[120,40],bridge:[70,30],craft:[96,50],gym:[100,54],church:[76,52],mosque:[76,52],police:[80,48],clinic:[72,46],fuel:[82,50],school:[90,50]};
+const PLACES={
+ 'lagos-mainland':[
+  ['suya','B1','Yaba Suya Spot','Spicy suya, onions and yaji pepper over open coals, a Lagos night staple.'],
+  ['market','B2','Computer Village','Ikeja’s famous phone and gadget market, loud, crowded and full of deals.',{colors:['#3d6fb0','#d9531e','#f1c24a','#6aa05b']}],
+  ['landmark','B3','National Theatre','The curved landmark at Iganmu, the heart of Lagos arts and culture.'],
+  ['spa','B4','Surulere Spa','A calm corner of the mainland: massage, steam and a cold zobo.'],
+  ['stadium','B5','Teslim Balogun Stadium','Football on the mainland: Surulere’s local match ground.'],
+  ['bridge','R','Third Mainland Bridge · Districts','The long bridge over the lagoon. Cross to Lagos Island and Victoria Island/Lekki.',{districts:true}]],
+ 'lagos-island':[
+  ['market','B1','Balogun Market','Lagos Island’s giant wholesale market for cloth, shoes and everything else.',{colors:['#c24a62','#3f7fb0','#e8b92f','#6aa05b']}],
+  ['suya','B2','Marina Suya Corner','Skewers by the Marina after work, cool lagoon breeze included.'],
+  ['landmark','B3','Freedom Park','The old colonial prison turned arts park on Broad Street.'],
+  ['hotel','B4','Marina Plaza Hotel','A business hotel on the Island with a rooftop pool.',{h:120}],
+  ['spa','B5','Island Wellness Spa','Hot stones, steam and a fresh coconut after a long Island day.'],
+  ['bridge','R','Third Mainland Bridge · Districts','Cross back to the Mainland or onward to Victoria Island and Lekki.',{districts:true}]],
+ 'lagos-vi':[
+  ['suya','B1','Ikoyi Suya Lounge','Suya with a view: beef, chicken and gizzard on a dressed-up grill.'],
+  ['beach','T2','Landmark Beach','Lagos’s Atlantic waterfront: sand, music, jet skis and suya on the shore.'],
+  ['spa','B2','VI Spa & Salon','A VI day spa: massage, facials and a salon chair.'],
+  ['hotel','B3','Victoria Island Hotel','Glass and marble on VI, with a pool and a bar on the roof.',{h:150}],
+  ['park','T3','Lekki Conservation Centre','Boardwalks through the forest and over the lagoon, with monkeys overhead.'],
+  ['market','B4','Lekki Arts & Crafts Market','Art, carvings and beads along the Lekki road.',{colors:['#a65a4f','#3f8e5b','#e8b92f','#3d6fb0']}],
+  ['bridge','R','Third Mainland Bridge · Districts','Drive back across to Lagos Island or the Mainland.',{districts:true}]],
+ portharcourt:[
+  ['hotel','B1','Presidential Hotel','Large and well-known: restaurants, pools and a sauna near the Pleasure Park.',{h:130,named:'PRESIDENTIAL HOTEL'}],
+  ['park','B2','Port Harcourt Pleasure Park','A big green city park with lakes, paths and picnic spots.'],
+  ['polo','T2','Port Harcourt Polo Club','Polo in the GRA: horses, white boards and a members’ clubhouse.'],
+  ['golf','T3','Python Golf Club','A parkland golf course with water hazards and red-flag greens.'],
+  ['market','B3','Mile One Market','Busy Diobu trading market full of fish, pepper and cloth.',{colors:['#d9531e','#3d6fb0','#f1c24a','#6aa05b']}],
+  ['mall','B4','Port Harcourt Mall','Shops, cinema and a food court in the Garden City.'],
+  ['suya','B5','Rumuola Suya Spot','Suya and pepper-soup, a Garden City specialty.'],
+  ['ferry','R','Bonny Island Ferry','Fast boats from the Port Harcourt waterfront to Bonny Island.',{bonny:true}]],
+ calabar:[
+  ['landmark','B1','Marina Resort','Waterfront resort with a slave history museum, cinema, restaurants and a quay.',{named:'MARINA RESORT'}],
+  ['museum','B2','Old Residency Museum','Colonial-era house with the region’s history, documents and objects.'],
+  ['mall','B3','Tinapa Resort','A free-trade shopping and entertainment complex on the edge of Calabar.'],
+  ['market','B4','Watt Market','Calabar’s everyday market for crayfish, spices and cloth.',{colors:['#3d6fb0','#f4f1e6','#d9531e','#6aa05b']}],
+  ['park','T2','Calabar Carnival Grounds','Home of the December carnival parade, bands and floats.'],
+  ['suya','B5','Marian Suya Joint','Late-night suya near Marian Road.'],
+  ['ferry','R','Calabar River Jetty','A small jetty for boat rides along the creek.',{ride:true}]],
+ sokoto:[
+  ['market','B1','Sokoto Central Market','A huge open-air market: grain, leather, cloth and spices.',{colors:['#c98a62','#f3e6c8','#a96d49','#6aa05b']}],
+  ['craft','B2','Sokoto Leather Works','Workshops making the famous red leather bags, shoes and cushions.'],
+  ['museum','B3','Sokoto Museum','Textiles, tools and stories of the Sokoto region.'],
+  ['suya','B4','Kasuwa Suya','Hausa-style suya: thin-sliced, peppery and wrapped in newspaper.'],
+  ['park','T2','Rima River Garden','Green banks of the Rima river, a cool evening spot.'],
+  ['stadium','B5','Sokoto Stadium','Local football on a dusty pitch.']],
+ enugu:[
+  ['landmark','B1','Okpara Square','The city’s central square with a monument and fountains.'],
+  ['market','B2','Ogbete Market','A famous central Enugu market: food, textiles and spare parts.',{colors:['#a15346','#e9c582','#3f8e5b','#3d6fb0']}],
+  ['hotel','B3','Nike Lake Resort','A lakeside resort with chalets, a pool and boat rides.',{h:100}],
+  ['park','T2','Ngwo Pine Forest','Cool hillside pines, caves and viewpoints.'],
+  ['mall','B4','Polo Park Mall','A modern shopping centre in the hill city.'],
+  ['suya','B5','Independence Layout Suya','Late-night suya on the hill.']],
+ benue:[
+  ['market','B1','Wurukum Market','Makurdi’s busy market: yams, fish and cloth.',{colors:['#2e3330','#f0e8d5','#bc554b','#6aa05b']}],
+  ['landmark','B2','Benue River Bridge','The river crossing and the city’s landmark skyline.'],
+  ['beach','B3','Benue Riverside','A sandy bank for fishing, boats and picnics.'],
+  ['craft','B4','Tiv Cloth Centre','A cloth-sellers’ yard with black-and-white striped textiles.'],
+  ['suya','B5','Makurdi Suya Stand','Suya, yam pottage and pounded yam.'],
+  ['park','T2','Harvest Festival Ground','A big field for the yam harvest celebration.']],
+ village:[
+  ['market','B1','Village Market Square','Market day: tomatoes, yams, baskets and gossip.',{colors:['#aa673e','#dfc98d','#6aa05b','#bc554b']}],
+  ['park','T2','Village Playing Field','Where the village football and wrestling happen.'],
+  ['craft','B2','Basket Weavers','Weavers selling baskets, mats and hats.']]
+};
+const PLACE_ACTIONS={
+ suya:(p,again)=>[{label:'Suya & onions · ₦1,500',detail:'Food +28 · Happiness +6 · 20 min',run:()=>transact(1500,20,()=>adjust(28,0,6,4),p.name+': “Enjoy!”',again)},{label:'Suya for friends · ₦4,000',detail:'Food +35 · Happiness +14 · 40 min',disabled:availableFunds()<4000,run:()=>transact(4000,40,()=>adjust(35,0,14,8),'You shared a big suya order.',again)}],
+ spa:(p,again)=>[{label:'Massage · ₦4,000',detail:'Energy +30 · Happiness +14 · 90 min',run:()=>transact(4000,90,()=>adjust(0,30,14,5),'You feel brand new.',again)},{label:'Facial & steam · ₦2,500',detail:'Energy +12 · Happiness +10 · 45 min',run:()=>transact(2500,45,()=>adjust(0,12,10,3),'Fresh and glowing.',again)}],
+ hotel:(p,again)=>[{label:'Book a night · ₦15,000',detail:'Sleep until morning · Energy to 100',disabled:availableFunds()<15000,run:()=>transact(15000,((1440-state.minutes)+420)%1440||1440,()=>adjust(20,100,15,10),'You slept well at '+p.name+'.',again)},{label:'Pool & lunch · ₦3,500',detail:'Food +30 · Happiness +12 · 90 min',run:()=>transact(3500,90,()=>adjust(30,10,12,5),'A lovely afternoon by the pool.',again)}],
+ mall:(p,again)=>[{label:'Cinema & snacks · ₦3,000',detail:'Happiness +16 · Food +10 · 120 min',run:()=>transact(3000,120,()=>adjust(10,-4,16,6),'A great film.',again)},{label:'Shop for something nice · ₦6,000',detail:'Happiness +14',disabled:availableFunds()<6000,run:()=>transact(6000,60,()=>adjust(0,-2,14,4),'Retail therapy works.',again)}],
+ market:(p,again)=>[{label:'Haggle for cloth · ₦2,000',detail:'Add a craft crate to your cargo',disabled:availableFunds()<2000||(state.cargo?.textiles||0)>=100,run:()=>transact(2000,45,()=>{state.cargo=state.cargo||{produce:0,textiles:0};state.cargo.textiles++;adjust(0,-3,6,4)},'You won the haggle.',again)},{label:'Fresh produce · ₦800',detail:'Add a produce crate to your cargo',disabled:availableFunds()<800||(state.cargo?.produce||0)>=100,run:()=>transact(800,30,()=>{state.cargo=state.cargo||{produce:0,textiles:0};state.cargo.produce++;adjust(0,-2,4,3)},'A good price.',again)},{label:'Street snack · ₦700',detail:'Food +15 · Happiness +4',run:()=>transact(700,10,()=>adjust(15,0,4,0),'Tasty.',again)}],
+ craft:(p,again)=>PLACE_ACTIONS.market(p,again).slice(0,1).concat([{label:'Watch the artisans · free',detail:'Happiness +5 · 30 min',run:()=>{advance(30);adjust(0,0,5,5);closeDialog();toast('You learned a lot watching them work.')}}]),
+ museum:(p,again)=>[{label:'Guided tour · ₦500',detail:'XP +20 once a day · Happiness +8 · 60 min',run:()=>{const first=(state.poiDay||(state.poiDay={}))[p.id]!==state.day;transact(500,60,()=>{state.poiDay[p.id]=state.day;adjust(0,-3,8,first?20:0)},first?'You learned something new · +20 XP':'A calm hour.',again)}}],
+ landmark:(p,again)=>[{label:'Explore & take photos · free',detail:'XP +15 once a day · Happiness +8 · 45 min',run:()=>{const first=(state.poiDay||(state.poiDay={}))[p.id]!==state.day;state.poiDay[p.id]=state.day;advance(45);adjust(0,-2,8,first?15:0);closeDialog();toast(first?p.name+' · +15 XP':'Another lovely look around.')}},{label:'Cold drink & snack · ₦900',detail:'Food +12 · Happiness +4',run:()=>transact(900,15,()=>adjust(12,0,4,0),'Refreshing.',again)}],
+ park:(p,again)=>[{label:'Walk & picnic · ₦1,000',detail:'Happiness +14 · Energy +6 · 90 min',run:()=>transact(1000,90,()=>adjust(12,6,14,4),'A peaceful afternoon.',again)}],
+ beach:(p,again)=>[{label:'Relax by the water · ₦1,000',detail:'Happiness +16 · Energy +8 · 90 min',run:()=>transact(1000,90,()=>adjust(0,8,16,4),'Waves and sunshine.',again)},{label:'Beach suya · ₦2,000',detail:'Food +24 · Happiness +8',run:()=>transact(2000,25,()=>adjust(24,0,8,3),'Suya by the sea.',again)}],
+ stadium:(p,again)=>[{label:'Watch a match · ₦1,500',detail:'Happiness +15 · 120 min',run:()=>transact(1500,120,()=>adjust(0,-6,15,6),'What a game!',again)}],
+ golf:(p,again)=>[{label:'Play 9 holes · ₦6,000',detail:'Happiness +20 · Energy −15 · XP +20 · 3 hours',disabled:state.energy<25||availableFunds()<6000,run:()=>transact(6000,180,()=>adjust(0,-15,20,20),'A fine round at '+p.name+'.',again)},{label:'Clubhouse lunch · ₦3,500',detail:'Food +30 · Happiness +8',run:()=>transact(3500,60,()=>adjust(30,5,8,3),'Lunch with a view.',again)}],
+ polo:(p,again)=>[{label:'Watch a polo match · ₦2,000',detail:'Happiness +15 · 120 min',run:()=>transact(2000,120,()=>adjust(0,-3,15,6),'Galloping and cheering.',again)},{label:'Clubhouse lunch · ₦3,500',detail:'Food +30 · Happiness +8',run:()=>transact(3500,60,()=>adjust(30,5,8,3),'A fine lunch.',again)}]
+};
+
+const CIVIC={
+ 'lagos-mainland':[['church','G1','Surulere Community Church'],['mosque','G2','Yaba Central Mosque'],['police','G3','Yaba Police Station'],['clinic','G4','Mainland General Clinic'],['fuel','L1','Ikeja Filling Station'],['school','R1','Yaba Grammar School']],
+ 'lagos-island':[['church','G1','Marina Cathedral'],['mosque','G2','Lagos Island Central Mosque'],['police','G3','Island Police Station'],['clinic','G4','Island General Hospital'],['fuel','L1','Marina Filling Station'],['school','R1','Island Grammar School']],
+ 'lagos-vi':[['church','G1','Lekki Chapel'],['mosque','G2','VI Mosque'],['police','G3','Victoria Island Police Post'],['clinic','G4','Lekki Medical Centre'],['fuel','L1','Lekki Filling Station'],['school','R1','Lekki International School']],
+ portharcourt:[['church','G1','Garden City Church'],['mosque','G2','Diobu Central Mosque'],['police','G3','Port Harcourt Police Station'],['clinic','G4','Rivers General Hospital'],['fuel','L1','Trans-Amadi Filling Station'],['school','R1','Government Secondary School']],
+ calabar:[['church','G1','Calabar Cathedral'],['mosque','G2','Calabar Central Mosque'],['police','G3','Calabar Police Station'],['clinic','G4','Calabar General Hospital'],['fuel','L1','Marian Filling Station'],['school','R1','Government College Calabar']],
+ sokoto:[['mosque','G1','Sokoto Central Mosque'],['mosque','G2','Gidan Dan Fodio Mosque'],['police','G3','Sokoto Police Station'],['clinic','G4','Sokoto Specialist Hospital'],['fuel','L1','Sokoto Filling Station'],['school','R1','Sokoto Model School']],
+ enugu:[['church','G1','Holy Ghost Cathedral'],['church','G2','Enugu Community Church'],['police','G3','Enugu Police Station'],['clinic','G4','Enugu Teaching Hospital'],['fuel','L1','Independence Layout Filling Station'],['school','R1','Enugu Secondary School']],
+ benue:[['church','G1','Makurdi Cathedral'],['mosque','G2','Makurdi Central Mosque'],['police','G3','Makurdi Police Station'],['clinic','G4','Benue General Hospital'],['fuel','L1','Makurdi Filling Station'],['school','R1','Benue Model School']],
+ village:[['church','G1','Village Church'],['clinic','G4','Village Health Centre'],['school','R1','Village Primary School']]
+};
+const CIVIC_DESC={gym:'A modern gym with cardio machines, free weights, classes and a smoothie bar.',church:'A welcoming place of worship with a Sunday choir and a community hall.',mosque:'A place of prayer and quiet reflection, open to visitors who dress modestly.',police:'The local police station. Officers can give directions and safety advice.',clinic:'A clinic with nurses, a pharmacy and a waiting room.',fuel:'A busy filling station with a shop and a car wash.',school:'A local school where evening classes run after hours.'};
+for(const key of Object.keys(CIVIC)){if(key!=='village')CIVIC[key].push(['gym','L2','iFitness Gym'])}
+for(const [key,list] of Object.entries(CIVIC)){PLACES[key]=(PLACES[key]||[]).concat(list.map(([kind,slot,name])=>[kind,slot,name,CIVIC_DESC[kind]]))}
+Object.assign(PLACE_ACTIONS,{
+ gym:(p,again)=>[{label:'Workout session · ₦2,500',detail:'Happiness +12 · XP +15 once a day · Energy −20 · Food −8 · 90 min',disabled:state.energy<25||availableFunds()<2500,run:()=>{const first=(state.poiDay||(state.poiDay={}))[p.id]!==state.day;transact(2500,90,()=>{state.poiDay[p.id]=state.day;adjust(-8,-20,12,first?15:3)},first?'Great session at iFitness · +15 XP':'Another solid workout.',again)}},{label:'Personal trainer · ₦6,000',detail:'XP +30 · Happiness +16 · Energy −25 · 120 min',disabled:state.energy<30||availableFunds()<6000,run:()=>transact(6000,120,()=>adjust(-10,-25,16,30),'Your trainer pushed you hard.',again)},{label:'Smoothie bar · ₦1,200',detail:'Food +12 · Energy +6',run:()=>transact(1200,10,()=>adjust(12,6,4,0),'Fresh and cold.',again)}],
+ church:(p,again)=>[{label:'Join the gathering · free',detail:'Happiness +10 · Energy +4 · 60 min',run:()=>{advance(60);adjust(0,4,10,3);closeDialog();toast('A peaceful hour with the community.')}},{label:'Give an offering · ₦500',detail:'Happiness +5',run:()=>transact(500,10,()=>adjust(0,0,5,2),'Your kindness is appreciated.',again)}],
+ mosque:(p,again)=>[{label:'Quiet reflection · free',detail:'Happiness +10 · Energy +5 · 30 min',run:()=>{advance(30);adjust(0,5,10,3);closeDialog();toast('A calm, quiet half hour.')}},{label:'Give to charity · ₦500',detail:'Happiness +5',run:()=>transact(500,10,()=>adjust(0,0,5,2),'Your generosity is appreciated.',again)}],
+ police:(p,again)=>[{label:'Ask for safety tips · free',detail:'Happiness +2 · 10 min',run:()=>showDialog('POLICE STATION',p.name,'<div class="dialogue">“Keep your phone out of sight in traffic, use the pedestrian crossing, and never share your card PIN with anyone. Stay safe out there.”</div>',[{label:'Thanks, officer.',run:()=>{advance(10);adjust(0,0,2,2);closeDialog()}}])}],
+ clinic:(p,again)=>[{label:'Health check-up · ₦1,500',detail:'Energy +20 · Happiness +5 · 45 min',run:()=>transact(1500,45,()=>adjust(0,20,5,3),'The nurse says you are doing well.',again)},{label:'Vitamins · ₦800',detail:'Energy +10',run:()=>transact(800,10,()=>adjust(0,10,2,0),'A little boost.',again)}],
+ fuel:(p,again)=>[{label:'Snacks & cold drink · ₦600',detail:'Food +10 · Happiness +3',run:()=>transact(600,10,()=>adjust(10,0,3,0),'Refreshing.',again)},{label:'Fuel your car · ₦4,000',detail:'Needs a car · Happiness +4',disabled:!state.vehicle||availableFunds()<4000,run:()=>transact(4000,15,()=>adjust(0,0,4,2),'Tank full.',again)}],
+ school:(p,again)=>[{label:'Evening class · ₦1,000',detail:'XP +15 once a day · Energy −5 · 90 min',run:()=>{const first=(state.poiDay||(state.poiDay={}))[p.id]!==state.day;transact(1000,90,()=>{state.poiDay[p.id]=state.day;adjust(0,-5,4,first?15:0)},first?'You learned something · +15 XP':'A good revision session.',again)}}]
+});
+function ferryActions(p,again){
+ if(p.opts?.bonny)return [{label:'Ferry to Bonny Island · ₦2,500',detail:'Day trip: seafood, LNG flares and a beach · 4 hours',disabled:availableFunds()<2500||state.energy<20,run:()=>{const first=(state.poiDay||(state.poiDay={}))[p.id]!==state.day;transact(2500,240,()=>{state.poiDay[p.id]=state.day;adjust(35,-8,18,first?35:0)},'Bonny Island: fresh fish, flares on the horizon, and a long ride home.',()=>showDialog('BONNY ISLAND','A day on Bonny Island','<div class="dialogue">“The boat crossed the creeks; Bonny’s waterfront smelled of fish on the grill, and across the water the gas flares burned in the evening.”</div><p>You had grilled fish by the jetty and walked the old waterfront.</p>',[{label:'Back to the mainland',run:closeDialog}]))}}];
+ return [{label:'Boat ride · ₦1,200',detail:'Happiness +12 · 60 min',run:()=>transact(1200,60,()=>adjust(0,-2,12,4),'A calm ride on the water.',again)}];
+}
+function districtDialog(){
+ const here=state.district||'mainland';
+ const opts=[['mainland','Lagos Mainland','Yaba, Ikeja & Surulere: bungalows, markets and the National Theatre'],['island','Lagos Island','Marina, Balogun Market and Broad Street: dense old Lagos'],['vi','Victoria Island & Lekki','Glass towers, Landmark Beach and the Lekki coast']];
+ showDialog('LAGOS','Which part of Lagos?','<p>Cross the Third Mainland Bridge to another district. Each has its own streets, buildings, venues and billboards.</p>',opts.filter(o=>o[0]!==here).map(o=>({label:o[1]+' · ₦800',detail:o[2]+' · 40 min',disabled:availableFunds()<800,run:()=>{if(!pay(800,'Bridge toll & ride'))return;closeDialog();advance(40);setDistrict(o[0]);toast('Welcome to '+o[1]+'.')}})));
+}
+function poiDialog(hub){
+ const p=hub.poi;const again=()=>poiDialog(hub);
+ if(p.opts?.districts)return districtDialog();
+ const actions=p.kind==='ferry'?ferryActions(p,again):(PLACE_ACTIONS[p.kind]||PLACE_ACTIONS.landmark)(p,again);
+ showDialog((p.tag||p.kind).toUpperCase()+' · '+(state.region==='lagos'?'LAGOS':region().name.toUpperCase()),p.name,'<div class="dialogue">'+p.desc+'</div>',[...actions,{label:'Leave',run:closeDialog}]);
+}
+/* hub registration */
+const BASE_HUBS=regionHubs.length;let placesKey=null,POI_BLOCK=[];
+function placeList(){return (PLACES[styleKey()]||[]).map(([kind,slot,name,desc,opts],index)=>{const [sx,sz]=SLOT[slot],[w,d]=KIND_SIZE[kind]||[90,50];const open=['golf','polo','park','beach'].includes(kind);return {id:styleKey()+':'+index,kind,slot,name,desc,opts:opts||{},x:sx,z:sz,w,d,open,tag:({gym:'Gym',church:'Church',mosque:'Mosque',police:'Police',clinic:'Clinic',fuel:'Filling station',school:'School',suya:'Suya spot',spa:'Spa',hotel:'Hotel',mall:'Mall',market:'Market',museum:'Museum',landmark:'Landmark',park:'Park',beach:'Beach',stadium:'Stadium',golf:'Golf club',polo:'Polo club',craft:'Crafts',ferry:'Ferry',bridge:'Districts'})[kind],hubX:sx,hubY:slot==='R'?sz:sz+(sz<600?d/2+30:d/2+30)}})}
+function refreshPlaces(){
+ const key=styleKey();if(placesKey===key)return;placesKey=key;regionHubs.length=BASE_HUBS;POI_BLOCK=[];
+ for(const p of placeList()){regionHubs.push({id:'poi:'+p.id,poi:p,x:p.hubX,y:p.hubY});if(!p.open&&p.slot!=='R')POI_BLOCK.push([p.x-p.w/2,p.z-p.d/2,p.x+p.w/2,p.z+p.d/2])}
+ if(typeof view3D!=='undefined')view3D.scene=null;
+}
+const previousHubName=hubName;hubName=function(hub){return hub.poi?hub.poi.name:previousHubName(hub)};
+const previousOpenHub=openHub;openHub=function(hub){if(hub.poi){poiDialog(hub);return}previousOpenHub(hub)};
+const previousOutdoorBlocked=outdoorBlocked;outdoorBlocked=function(x,y,radius=12){return previousOutdoorBlocked(x,y,radius)||POI_BLOCK.some(r=>x>r[0]-radius&&x<r[2]+radius&&y>r[1]-radius&&y<r[3]+radius)};
+const previousSyncPlaces=syncRegion;
+const DISTRICT_NAMES={
+ mainland:['Surulere Family House','Yaba Tech Hub','Mama Put Yaba','Unity Bank Ikeja','Computer Village Store','Palm Court Surulere','Mainland Motors','Ikeja After Hours'],
+ island:['Island Family Flat','Marina Towers Office','Balogun Buka','Unity Bank Broad Street','Idumota Market Store','Ikoyi Court Apartments','Island Motors','Eko Lounge'],
+ vi:['Lekki Duplex','Adeola Odeku Offices','VI Grill House','Unity Bank VI','Lekki Plaza Store','Eko Atlantic Residences','Lekki Luxury Motors','Landmark Beach Club']
+};
+const CITY_NAMES={
+ portharcourt:['D-Line Family House','Trans-Amadi Offices','Pepper-Soup Joint','Unity Bank Aba Road','Mile One Store','Presidential Hotel','Harbour Motors','Rivers Lounge'],
+ calabar:['Marian Family House','Tinapa Business Centre','Afang Kitchen','Unity Bank Calabar','Watt Market Store','Calabar Guest Lodge','Creek Motors','Marina Nights'],
+ sokoto:['Hausa Compound Home','Savannah Trade Office','Kasuwa Kitchen','Unity Bank Sokoto','Leather Market Shop','Sokoto Guest House','Northern Motors','Rima Garden Lounge'],
+ enugu:['Independence Layout Home','Coal City Studio','Hilltop Kitchen','Unity Bank Enugu','Ogbete Store','Nike Court Apartments','Eastern Motors','Okpara Lounge'],
+ benue:['Wadata Family Home','Makurdi Harvest Office','River Kitchen','Unity Bank Makurdi','Wurukum Store','River Court Lodge','Valley Motors','Benue Riverside Lounge']
+};
+function applyBuildingNames(){
+ const list=state.region==='lagos'?DISTRICT_NAMES[state.district||'mainland']:CITY_NAMES[state.region];if(!list)return;
+ buildings.forEach((b,index)=>{b.name=list[index];b.sign=b.name.toUpperCase()});
+}
+syncRegion=function(){previousSyncPlaces();applyBuildingNames();refreshPlaces()};
+function setDistrict(id){state.district=id;placesKey=null;applyBuildingNames();refreshPlaces();if(typeof applyTrafficRegion==='function')applyTrafficRegion();view3D.scene=null;state.x=935;state.y=1190;route=[];target=null;camera={x:state.x,y:state.y};save();refresh()}
+/* persistence */
+const previousNormalizePlaces=normalize;normalize=function(data){const clean=previousNormalizePlaces(data);clean.district=['mainland','island','vi'].includes(data.district)?data.district:'mainland';clean.poiDay=Object.fromEntries(Object.entries(data.poiDay&&typeof data.poiDay==='object'?data.poiDay:{}).filter(([k,v])=>typeof k==='string'&&Number.isFinite(v)).slice(0,60));return clean};
+/* 3D models */
+function placeModel3D(buffer,p){
+ const x=p.x,z=p.z,w=p.w,d=p.d,box=(px,py,pz,W,H,D,c,a=0)=>meshBox(buffer,px,py,pz,W,H,D,c,a),ball=(px,py,pz,rx,ry,rz,c)=>meshBall(buffer,px,py,pz,rx,ry,rz,c),zf=z+d/2;
+ const sign=(text,y,width,bg,fg)=>{box(x,y,zf+2,width+8,16,3,bg);voxelText(buffer,text,x,y-5,zf+4,width,2.2,fg)};
+ const palm=(px,pz,h=70)=>{for(let i=0;i<3;i++)box(px+i,10+i*h/3,pz,6,h/3,6,'#8b6a4a');for(let i=0;i<6;i++){const a=i*Math.PI/3;box(px+Math.cos(a)*14+3,h-2,pz+Math.sin(a)*14,28,3,5,'#4f8a45',-a)}};
+ switch(p.kind){
+  case 'suya':box(x,5,z,w,3,d,'#b9a888');box(x,22,z-d/2+3,w,44,4,'#7a5846');box(x,48,z,w+6,4,d+4,'#8d2f25');for(let i=0;i<9;i++)box(x-w/2+5+i*(w-10)/8,45,zf+4,(w-10)/8,3,10,i%2?'#d84b3a':'#f4f1e6');for(const o of [-1,1])box(x+o*(w/2-4),24,zf+2,3,48,3,'#5a4636');box(x,12,z+4,w*.6,14,16,'#3a3633');for(let i=0;i<12;i++)box(x-w*.27+i*w*.05,22,z+4,2,2,2,'#ff8b2b');for(let i=0;i<3;i++)box(x-w*.3+i*w*.3,8,zf-6,12,12,12,'#d7a65a');sign('SUYA',60,34,'#d9531e','#fff6df');break;
+  case 'spa':box(x,24,z,w,48,d,'#efe9dc');box(x,52,z,w+8,6,d+8,'#3f8e6b');box(x,22,zf+1,w-20,34,2,'#6fb4b8');for(let i=0;i<6;i++)box(x-w*.4+i*w*.16,28,zf+4,3,56,3,'#b4905a');for(const o of [-1,1])ball(x+o*(w/2+12),14,zf+6,10,14,10,'#4f8a45');box(x,2,zf+16,w*.8,3,16,'#7ec0d4');sign('SPA',64,24,'#2f6d54','#f6f1da');break;
+  case 'hotel':{const h=p.opts.h||120;box(x,h/2,z,w,h,d,'#e6dcc6');for(let lv=24;lv<h-6;lv+=16)box(x,lv,zf+1,w-12,8,2,'#6fa0b4');box(x,h+3,z,w+4,6,d+4,'#8d9a96');box(x,12,zf+14,w*.6,4,24,'#b9a888');for(const o of [-1,1])box(x+o*w*.26,6,zf+22,6,12,6,'#f2ecd9');box(x+w*.75,3,z+8,w*.7,3,d*.8,'#7ec0d4');box(x+w*.75,1,z+8,w*.74,2,d*.84,'#f6f1da');palm(x-w*.65,z+8,60);box(x,h+22,z,w*.9,22,6,'#14372e');voxelText(buffer,p.opts.named||p.name.toUpperCase(),x,h+18,z+4,w*.84,2.4,'#f6f1da');box(x-w/2+6,h+22,z,2,30,2,'#6c7c80');break}
+  case 'mall':box(x,38,z,w,76,d,'#d7d2c3');box(x,34,zf+1,w-16,50,2,'#7fb0bd');box(x,80,z,w+4,6,d+4,'#4f5d63');box(x,66,zf+3,w-10,14,3,'#14372e');voxelText(buffer,p.name.toUpperCase().slice(0,16),x,62,zf+5,w-18,2.2,'#c0e573');for(let i=0;i<5;i++)box(x-w*.4+i*w*.2,8,zf+10,10,16,10,'#8a9a72');break;
+  case 'market':case 'craft':{box(x,2,z,w,3,d,p.kind==='craft'?'#c9a96c':'#cfc4a4');const cols=p.opts.colors||['#d9531e','#3d6fb0','#f1c24a','#6aa05b'];for(let i=0;i<5;i++)for(let j=0;j<2;j++){const px=x-w*.4+i*w*.2,pz=z-d*.22+j*d*.44;box(px,20,pz,3,40,3,'#5a4636');box(px,42,pz,w*.17,3,d*.34,cols[(i+j)%cols.length]);box(px,8,pz,w*.12,10,10,cols[(i+j+1)%cols.length])}sign(p.kind==='craft'?'CRAFTS':'MARKET',66,52,'#3f3a2e','#f3e6c8');break}
+  case 'museum':box(x,30,z,w,60,d,'#efe6d1');box(x,64,z,w+10,10,d+10,'#a4533f');for(let i=0;i<6;i++)box(x-w*.4+i*w*.16,28,zf+10,6,56,6,'#fbf6e7');box(x,60,zf+10,w*.9,6,12,'#a4533f');box(x,3,zf+16,w*.9,4,14,'#d6d0bd');sign('MUSEUM',76,50,'#3f3a2e','#f3e6c8');break;
+  case 'landmark':box(x,2,z,w,3,d,'#d8cdb2');box(x,26,z,18,52,18,'#c9bfa4');ball(x,56,z,26,10,26,'#a4533f');for(const o of [-1,1])box(x+o*w*.32,12,z,10,24,10,'#b9a888');ball(x+w*.4,10,z+d*.3,10,10,10,'#4f8a45');ball(x-w*.4,10,z+d*.3,10,10,10,'#4f8a45');box(x,74,z,3,22,3,'#d8d2c0');break;
+  case 'stadium':for(const [px,pz,W,D] of [[x,z-d/2,w,8],[x,z+d/2,w,8],[x-w/2,z,8,d],[x+w/2,z,8,d]])box(px,16,pz,W,32,D,'#c6bfa8');box(x,2,z,w-12,2,d-12,'#4f8a45');for(const [px,pz] of [[x-w/2,z-d/2],[x+w/2,z-d/2],[x-w/2,z+d/2],[x+w/2,z+d/2]]){box(px,40,pz,4,80,4,'#6c7c80');box(px,82,pz,14,5,8,'#f0e7c8')}break;
+  case 'golf':box(x,1,z,w,2,d,'#5f9b4a');box(x+w*.1,1.6,z,w*.5,2,d*.7,'#74ad55');box(x-w*.3,1.8,z+d*.2,50,2,24,'#2f7fa6');box(x+w*.3,1.8,z-d*.2,28,2,16,'#e0d3a3');for(const [px,pz] of [[x-w*.1,z-d*.1],[x+w*.38,z+d*.2]]){box(px,14,pz,2,28,2,'#f4f1e6');box(px+5,25,pz,10,6,1,'#d9341e')}box(x-w*.43,12,z-d*.3,48,24,26,'#efe6d1');box(x-w*.43,26,z-d*.3,54,6,32,'#a4533f');for(let i=0;i<5;i++)palm(x-w*.45+i*w*.22,z+d*.46,52);sign(p.name.toUpperCase().slice(0,18),50,86,'#14372e','#f6f1da');break;
+  case 'polo':box(x,1,z,w,2,d,'#5f9b4a');for(const [px,pz,W,D] of [[x,z-d/2,w,3],[x,z+d/2,w,3],[x-w/2,z,3,d],[x+w/2,z,3,d]])box(px,6,pz,W,12,D,'#f4f1e6');for(const o of [-1,1]){box(x+o*(w/2-10),14,z-12,2,28,2,'#f4f1e6');box(x+o*(w/2-10),14,z+12,2,28,2,'#f4f1e6')}for(const [px,pz,c] of [[x-30,z+4,'#6b4a2b'],[x+20,z-10,'#a8764a'],[x+50,z+12,'#3a2a1d']]){box(px,14,pz,24,12,8,c);box(px+14,22,pz,6,12,5,c);for(const lx of [-8,8])for(const lz of [-2,2])box(px+lx,5,pz+lz,2,10,2,c);box(px-2,28,pz,6,12,5,['#c24a62','#3f7fb0','#f1c24a'][Math.abs(Math.round(px))%3])}box(x-w*.4,14,z-d*.5-6,60,28,16,'#efe6d1');box(x-w*.4,30,z-d*.5-6,66,5,22,'#a4533f');sign('POLO CLUB',50,56,'#14372e','#f6f1da');break;
+  case 'park':box(x,1,z,w,2,d,'#6aa05b');box(x,1.6,z,w*.9,2,8,'#cfc4a4');box(x,1.8,z+d*.2,70,2,28,'#4f87a0');for(let i=0;i<7;i++)tree3D(buffer,x-w*.45+i*w*.15,z-d*.28+(i%2)*d*.5,.8);box(x+w*.3,12,z,22,24,22,'#cfc4a4');box(x+w*.3,26,z,30,4,30,'#a4533f');sign(p.name.toUpperCase().slice(0,20),44,90,'#2f6d54','#f6f1da');break;
+  case 'beach':box(x,1,z,w,2,d,'#ecd9a6');box(x,1.5,z+d*.55,w+40,2,d*.6,'#4f87a0');for(let i=0;i<4;i++){box(x-w*.35+i*w*.23,16,z,2,32,2,'#f4f1e6');box(x-w*.35+i*w*.23,32,z,24,3,24,['#d9531e','#3d6fb0','#f1c24a','#c24a62'][i])}palm(x-w*.45,z-d*.3,64);palm(x+w*.45,z-d*.2,58);sign(p.name.toUpperCase().slice(0,16),52,72,'#2f6d54','#f6f1da');break;
+  case 'gym':box(x,24,z,w,48,d,'#26292b');box(x,50,z,w+6,5,d+6,'#c0e573');box(x,24,zf+1,w-18,30,2,'#7fb0bd');for(let i=0;i<4;i++){box(x-w*.34+i*w*.23,12,zf-3,10,22,14,'#3a3f42');box(x-w*.34+i*w*.23,26,zf-7,14,3,3,'#c0e573')}box(x,62,z,w*.8,16,6,'#14372e');voxelText(buffer,'IFITNESS GYM',x,59,z+4,w*.76,2.2,'#c0e573');for(const o of [-1,1]){box(x+o*10,74,z,3,12,3,'#c0e573');box(x+o*10,68,z,16,3,3,'#c0e573')}break;
+  case 'church':box(x,24,z,w,48,d,'#efe9dc');box(x,52,z,w+8,22,d+8,'#8d4a3a');box(x-w*.32,52,zf+2,16,60,16,'#efe9dc');box(x-w*.32,92,zf+2,18,16,18,'#8d4a3a');box(x-w*.32,108,zf+2,3,16,3,'#efe9dc');box(x-w*.32,112,zf+2,12,3,3,'#efe9dc');box(x+w*.1,18,zf+1,20,36,2,'#4b3a2c');box(x,20,zf+1,w*.4,22,2,'#6fb4b8');sign('CHURCH',70,44,'#14372e','#f6f1da');break;
+  case 'mosque':box(x,22,z,w,44,d,'#f1ece0');ball(x,50,z,26,22,26,'#2f8a6b');box(x+w*.45,40,z-d*.2,10,80,10,'#f1ece0');ball(x+w*.45,86,z-d*.2,7,9,7,'#2f8a6b');box(x,18,zf+1,24,32,2,'#2f8a6b');sign('MOSQUE',64,44,'#14372e','#f6f1da');break;
+  case 'police':box(x,26,z,w,52,d,'#6f8aa6');box(x,56,z,w+6,6,d+6,'#3d546a');box(x,20,zf+1,w*.5,30,2,'#dbe7ef');box(x+w*.45,40,z,2,80,2,'#d0d4d6');box(x+w*.45+6,72,z,12,8,1,'#2f8a4b');sign('POLICE',74,44,'#243b55','#f6f1da');break;
+  case 'clinic':box(x,22,z,w,44,d,'#f4f6f2');box(x,48,z,w+6,5,d+6,'#6a9a74');box(x,24,zf+1,w*.6,24,2,'#9bd0d6');box(x-w*.3,60,zf+2,6,20,3,'#2f8a4b');box(x-w*.3,60,zf+2,20,6,3,'#2f8a4b');sign('CLINIC',66,44,'#2f8a4b','#ffffff');break;
+  case 'fuel':box(x,2,z,w,3,d,'#6f7679');box(x,40,z,w,4,d-8,'#d9531e');for(const o of [-1,1])box(x+o*w*.42,20,z,4,40,4,'#e9e5d3');for(const o of [-.25,.25]){box(x+o*w,12,z,8,24,12,'#d9d9d0');box(x+o*w,26,z,10,6,12,'#2f6fc4')}box(x+w*.62,16,z-d*.2,26,32,24,'#e8e0c8');sign('FUEL',54,32,'#14372e','#ffd24a');break;
+  case 'school':box(x,22,z,w,44,d,'#e3c98a');box(x,48,z,w+6,6,d+6,'#9a5b3f');for(let i=0;i<5;i++)box(x-w*.4+i*w*.2,26,zf+1,14,16,2,'#6fa0b4');box(x+w*.5,40,z,2,80,2,'#d0d4d6');box(x+w*.5+7,72,z,14,9,1,'#2f8a4b');sign('SCHOOL',66,48,'#14372e','#f6f1da');break;
+  case 'ferry':case 'bridge':
+   if(p.opts.districts){box(x,6,z,w,3,d,'#c0b99e');for(const o of [-1,1])box(x+o*w*.4,18,z,4,30,4,'#dce2c8');voxelText(buffer,'DISTRICTS',x,50,z+6,60,2,'#2f6d54');break}
+   box(x,5,z+40,22,3,100,'#8a6a4a');box(x+36,8,z+86,26,10,52,'#f6f1da');box(x+36,18,z+86,18,14,24,'#6fb4b8');box(x+36,27,z+86,22,3,28,'#d9531e');for(let i=0;i<5;i++)box(x-8,3,z+4+i*20,3,8,3,'#5a4636');box(x,36,z-2,60,18,3,'#14372e');voxelText(buffer,(p.opts.bonny?'BONNY FERRY':'RIVER JETTY'),x,34,z,56,2,'#f6f1da');break;
+ }
+}
+const previousBuildRegionPlaces=buildRegion3D;
+buildRegion3D=function(buffer){previousBuildRegionPlaces(buffer);refreshPlaces();for(const p of placeList())placeModel3D(buffer,p);
+ if(state.region==='portharcourt'){for(const x of [1000,1120,1240,1360,1480]){meshBox(buffer,x,30,1322,8,60,8,'#7b8387');meshBall(buffer,x,66,1322,6,14,6,'#ff8a2b')}for(const x of [1180,1300,1420])meshBox(buffer,x,18,1325,50,36,34,'#d9d9cf');view3D.labels.push({text:'Bonny Island',x:1240,y:90,z:1325})}
+};
+
+</script>
+<!--/ch:places.js-->
+<!--ch:utilities.js-->
+<script>
+/* NEPA power lines, transformers and cell towers; plus security guards inside buildings */
+const UTIL={
+ lagos:{spacing:150,wires:5,towers:[[430,92],[1250,92],[1880,1180]]},
+ village:{spacing:300,wires:3,towers:[[1100,92]]},
+ calabar:{spacing:190,wires:4,towers:[[1000,92],[1500,92]]},
+ portharcourt:{spacing:170,wires:5,towers:[[500,92],[1450,92],[260,1180]]},
+ sokoto:{spacing:260,wires:3,towers:[[1050,92]]},
+ enugu:{spacing:210,wires:4,towers:[[560,92],[1500,92]]},
+ benue:{spacing:260,wires:3,towers:[[1050,92]]}
+};
+function pole3D(buffer,x,z,withTransformer){
+ const box=(px,py,pz,W,H,D,c)=>meshBox(buffer,px,py,pz,W,H,D,c);
+ box(x,46,z,5,92,5,'#7a5b3d');box(x,86,z,40,3,3,'#5a4636');box(x,76,z,30,2,2,'#5a4636');for(const o of [-17,-6,6,17])box(x+o,90,z,3,5,3,'#e8e8e0');
+ if(withTransformer){box(x+9,68,z,13,17,13,'#8b979b');box(x+9,78,z,9,3,9,'#5c6663')}
+}
+function wires3D(buffer,x1,x2,z,count){
+ const len=x2-x1,mid=(x1+x2)/2,drops=[0,-3.5,0];
+ for(let line=0;line<count;line++){const offsetZ=(line-(count-1)/2)*2.2,y=86-(line%2)*10;const segs=6;for(let i=0;i<segs;i++){const t0=i/segs,t1=(i+1)/segs,sag0=Math.sin(t0*Math.PI)*-6,sag1=Math.sin(t1*Math.PI)*-6,xa=x1+len*t0,xb=x1+len*t1;meshBox(buffer,(xa+xb)/2,y+(sag0+sag1)/2,z+offsetZ*.25,Math.abs(xb-xa)+1,1.1,1.1,'#2b2b2b')}}
+}
+function tower3D(buffer,x,z){
+ const box=(px,py,pz,W,H,D,c)=>meshBox(buffer,px,py,pz,W,H,D,c),levels=7,seg=26;
+ for(let i=0;i<levels;i++){const w=22-i*2.4,y=i*seg+seg/2;for(const sx of [-1,1])for(const sz of [-1,1])box(x+sx*w/2,y,z+sz*w/2,2.4,seg,2.4,i%2?'#d9d9d0':'#d85a3a');box(x,i*seg+2,z+w/2,w,2,2,'#aaa');box(x+w/2,i*seg+2,z,2,2,w,'#aaa');box(x,i*seg+seg*.55,z+w/2,w,1.6,1.6,'#9a9a92')}
+ const top=levels*seg;box(x,top+10,z,3,22,3,'#d85a3a');for(const a of [0,2.1,4.2])box(x+Math.cos(a)*9,top-18,z+Math.sin(a)*9,6,22,2.5,'#eeeeea',-a);meshBall(buffer,x,top+24,z,3.5,3.5,3.5,'#ff3b30');box(x,3,z,32,5,32,'#8b8b84');box(x+22,8,z+10,16,16,14,'#c9c9c0');
+}
+const previousBuildRegionUtil=buildRegion3D;
+buildRegion3D=function(buffer){
+ previousBuildRegionUtil(buffer);const cfg=UTIL[state.region]||UTIL.lagos;
+ for(const z of [470,1103]){let prev=null,index=0;for(let x=60;x<=1960;x+=cfg.spacing){if(x>840&&x<1030){prev=null;continue}pole3D(buffer,x,z,index%3===1);if(prev!==null)wires3D(buffer,prev,x,z,cfg.wires);prev=x;index++}}
+ for(const [x,z] of cfg.towers)tower3D(buffer,x,z);
+};
+/* Security guards at the door of every building interior (except home) */
+const GUARD={id:'guard',guard:true,uniform:'guard',gender:'male',skin:'#593621',outfit:'#2b3340',hair:'cropped',facing:'up',x:372,y:626};
+function drawGuard3D(buffer){if(!state.room||state.room==='home')return;person3D(buffer,{...GUARD,skin:state.room==='bank'?'#885537':'#593621'},0,false);if(['bank','club','apartment'].includes(state.room))person3D(buffer,{...GUARD,x:528,y:626,skin:'#885537'},0,false)}
+const previousPerson3DGuard=person3D;
+person3D=function(buffer,entity,phase,moving){
+ previousPerson3DGuard(buffer,entity,phase,moving);if(!entity.guard)return;
+ const box=(x,y,z,w,h,d,c)=>meshBox(buffer,entity.x+x,y,entity.y+z,w,h,d,c);
+ box(0,42,6.2,17,19,1.4,'#d8e24a');box(-5,42,6.9,2,19,.8,'#f3f3ea');box(5,42,6.9,2,19,.8,'#f3f3ea');box(0,38,6.9,17,2,.8,'#f3f3ea');box(10,28,3,3,9,3,'#222');box(10,36,3,2,4,2,'#d0d0d0');box(0,80,.5,19,5,17,'#252d38');box(0,76,8,19,1.5,6,'#252d38');box(0,81,7,5,3,1,'#d9a441');
+};
+const previousEnterRoomGuard=enterRoom;
+enterRoom=function(building){previousEnterRoomGuard(building);if(building.id!=='home'){const h=Math.floor(state.minutes/60);setTimeout(()=>toast('Security: “'+(h<12?'Good morning':h<17?'Good afternoon':'Good evening')+', welcome to '+building.name+'.”'),600)}};
+const previousRenderGuard=render;
+render=function(){previousRenderGuard();if(!started||!state.room||state.room==='home'||!view3D.enabled||!view3D.basis)return;label3D('SECURITY',GUARD.x,98,GUARD.y);if(['bank','club','apartment'].includes(state.room))label3D('SECURITY',528,98,626)};
+
+</script>
+<!--/ch:utilities.js-->
+<!--ch:layout2.js-->
+<script>
+(()=>{
+ const fab=document.createElement('div');fab.id='zoom-fab';
+ const plus=document.createElement('button'),minus=document.createElement('button');plus.textContent='+';minus.textContent='−';plus.setAttribute('aria-label','Zoom in');minus.setAttribute('aria-label','Zoom out');
+ plus.onclick=()=>setWorldZoom(userZoom*1.25);minus.onclick=()=>setWorldZoom(userZoom/1.25);fab.append(plus,minus);document.body.append(fab);
+ if(innerWidth<700)setWorldZoom(.62);
+})();
+/* Calmer screen: world labels only appear near you */
+(()=>{const previous=label3D;label3D=function(text,x,y,z,highlight=false){if(!highlight&&!state.room&&Math.hypot(x-state.x,z-state.y)>(innerWidth<700?220:380))return;previous(text,x,y,z,highlight)}})();
+
+</script>
+<!--/ch:layout2.js-->
+<!--ch:rides.js-->
+<script>
+/* Order a cab to anywhere in the current city */
+const RIDE_STYLE={calabar:['Blue & white cab','#2f6fc4'],lagos:['Yellow cab','#e8b92f'],portharcourt:['City cab','#c8503c'],sokoto:['Keke','#2f8a4b'],enugu:['City cab','#c8503c'],benue:['Keke','#2f8a4b'],village:['Okada','#c8503c']};
+let rideToken=0;
+function rideDestinations(){
+ const out=[];for(const b of buildings)out.push({name:b.name,x:b.door.x,y:b.door.y+20,group:'Buildings'});
+ for(const hub of regionHubs){const label=hub.poi?(hub.poi.opts?.districts?null:hub.poi.tag):hub.id==='airport'||hub.id==='coach'?'Transport':hub.id==='trade'?'Port & depot':'Culture';if(label)out.push({name:hubName(hub),x:hub.x,y:hub.y,group:label})}
+ return out;
+}
+function rideQuote(dest){const from=state.room?(buildings.find(b=>b.id===state.room)?.door||{x:state.x,y:state.y}):{x:state.x,y:state.y},dist=Math.hypot(dest.x-from.x,dest.y-from.y),fare=Math.max(400,Math.round((300+dist*.5)/50)*50),minutes=Math.round(8+dist/70);return {dist,fare,minutes}}
+function rideMenu(){
+ if(typeof started!=='undefined'&&!started)return;
+ const [vehicle,color]=RIDE_STYLE[state.region]||RIDE_STYLE.lagos,dests=rideDestinations().map(d=>({...d,...rideQuote(d)})).filter(d=>d.dist>90).sort((a,b)=>a.dist-b.dist);
+ showDialog('ORDER A RIDE','Where to?','<p>A <b style="color:'+color+'">'+vehicle+'</b> will take you anywhere in '+(state.region==='lagos'?{mainland:'Lagos Mainland',island:'Lagos Island',vi:'Victoria Island & Lekki'}[state.district||'mainland']:region().name)+'. The fare is charged when you arrive.</p>',
+  dests.slice(0,24).map(d=>({label:d.name,detail:d.group+' · '+money(d.fare)+' · about '+d.minutes+' min',disabled:availableFunds()<d.fare,run:()=>rideTrip(vehicle,d)})));
+}
+function rideTrip(vehicle,dest){
+ const token=++rideToken;closeDialog();
+ showDialog('ON THE WAY',vehicle+' to '+dest.name,'<div class="journey-window"><div class="journey-scenery">🌳　▥　🌳　▥　🌴　▥</div></div><div class="journey-seat"></div><progress class="journey-progress" max="100" value="0" aria-label="Ride progress"></progress><p>Sit back. You will be there in a moment.</p>',[]);
+ const start=performance.now();
+ const step=()=>{if(token!==rideToken||$('dialog').hidden)return;const progress=Math.min(100,(performance.now()-start)/22),bar=document.querySelector('.journey-progress');if(bar)bar.value=progress;if(progress<100){requestAnimationFrame(step);return}
+  closeDialog();if(!pay(dest.fare,vehicle+' fare')){toast('Not enough money for the fare.');return}
+  advance(dest.minutes);const wasIn=!!state.room;state.room=null;state.driving=false;state.x=dest.x;state.y=dest.y;state.facing='down';route=[];target=null;camera={x:dest.x,y:dest.y};if(typeof view3D!=='undefined'){view3D.scene=null;view3D.focus={x:dest.x,z:dest.y}}portalCooldown=.8;findNearby();findHubNearby();refresh();save();toast('Dropped off at '+dest.name+' · '+money(dest.fare))};
+ requestAnimationFrame(step);
+}
+(()=>{const bottom=document.querySelector('.bottom'),button=document.createElement('button');button.className='nav-btn';button.id='ride-btn';button.setAttribute('aria-label','Order a ride');button.textContent='🚕 Ride';button.onclick=rideMenu;(document.getElementById('missions-btn')||document.getElementById('life')).after(button)})();
+addEventListener('keydown',event=>{if((event.key==='r'||event.key==='R')&&!event.target.closest?.('input,select,textarea')&&started&&$('dialog').hidden&&$('creation').hidden)rideMenu()});
+
+</script>
+<!--/ch:rides.js-->
 </body>
 </html>
