@@ -60,6 +60,7 @@ let width=innerWidth,height=innerHeight,dpr=Math.min(devicePixelRatio||1,2),zoom
 const keys=new Set(),joy={x:0,y:0,id:null},npcs=npcDefs.map((npc,index)=>({...npc,route:[],wait:index*.7,phase:index}));
 const clamp=(value,min,max)=>Math.max(min,Math.min(max,value)),money=value=>'₦'+Math.round(value).toLocaleString('en-NG'),level=()=>Math.floor(state.xp/150)+1;
 function outdoorBlocked(x,y,radius=12){return x<35||y<100||x>WORLD.w-35||y>WORLD.h-40||(y>1240-radius&&y<1295+radius&&(x<875+radius||x>995-radius))||buildings.some(building=>x>building.x-radius&&x<building.x+building.w+radius&&y>building.y-radius&&y<building.y+building.h+radius)}
+function findRoomBuilding(){return buildings.find(b=>b.id===state.room)}
 function blocked(x,y,radius=12){return state.room?roomBlocked(state.room,x,y,radius):outdoorBlocked(x,y,radius)}
 function move(entity,dx,dy){if(Math.hypot(dx,dy)>.001)entity.facing=Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up');if(!blocked(entity.x+dx,entity.y))entity.x+=dx;if(!blocked(entity.x,entity.y+dy))entity.y+=dy}
 function pedestrianRoadAllowed(x,y){return !(((y>476&&y<612)||(y>982&&y<1090))&&!((x>=445&&x<=495)||(x>=1375&&x<=1425)))&&!(x>882&&x<982&&!((y>=625&&y<=675)||(y>=925&&y<=975)))}
@@ -168,7 +169,7 @@ function enterRoom(building){
 function leaveRoom(){
  portalCooldown=.7;
  playDoorSound();
- const building=buildings.find(item=>item.id===state.room);if(!building)return;state.room=null;state.x=building.door.x;state.y=building.door.y+25;state.facing='down';route=[];target=null;stopInput();resize();camera={x:state.x,y:state.y};findNearby();refresh();save();toast('Back outside · '+building.name);
+ const building=findRoomBuilding();if(!building)return;state.room=null;state.x=building.door.x;state.y=building.door.y+25;state.facing='down';route=[];target=null;stopInput();resize();camera={x:state.x,y:state.y};findNearby();refresh();save();toast('Back outside · '+building.name);
 }
 let trafficTime=0;
 const junctions=[{y:544,top:477,bottom:612,offset:0},{y:1036,top:983,bottom:1090,offset:9}];
@@ -207,7 +208,7 @@ function roomFurniture(item){
  else {round(ctx,x,y,w,h,5,type==='counter'?'#a3815e':'#af8e64');round(ctx,x+3,y+3,w-6,h-13,4,'#ddc296');if(type==='desk'){round(ctx,x+w/2-23,y+8,46,25,3,'#38574f');round(ctx,x+w/2-18,y+11,36,16,1,'#9db7a3');round(ctx,x+w/2-20,y+38,40,9,2,'#eee6cf')}if(type==='table'){ellipse(ctx,x+w/2,y+h/2,20,12,'#f6edcf');ellipse(ctx,x+w/2,y+h/2,13,8,'#c48142')}}
 }
 function renderRoom(){
- const building=buildings.find(item=>item.id===state.room),room=roomLayouts[state.room];zoom=(width<600?.9:Math.min(1.2,(width-70)/930,(height-160)/600))*userZoom;
+ const building=findRoomBuilding(),room=roomLayouts[state.room];zoom=(width<600?.9:Math.min(1.2,(width-70)/930,(height-160)/600))*userZoom;
  camera.x=width/zoom>=900?450:clamp(state.x,width/(2*zoom),900-width/(2*zoom));camera.y=height/zoom>=720?390:clamp(state.y,height*.53/zoom,720-height*.47/zoom);
  ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle='#647769';ctx.fillRect(0,0,width,height);ctx.save();ctx.translate(width/2-camera.x*zoom,height*.53-camera.y*zoom);ctx.scale(zoom,zoom);
  round(ctx,79,179,752,505,20,'#253b3340');round(ctx,80,130,740,530,12,room.wall);round(ctx,95,210,710,450,2,room.floor);ctx.strokeStyle='#ffffff20';ctx.lineWidth=1;for(let lineY=210;lineY<660;lineY+=40){ctx.beginPath();ctx.moveTo(95,lineY);ctx.lineTo(805,lineY);ctx.stroke()}for(let lineX=95;lineX<805;lineX+=60){ctx.beginPath();ctx.moveTo(lineX,210);ctx.lineTo(lineX,660);ctx.stroke()}
@@ -221,7 +222,7 @@ function renderRoom(){
  layers.push({y:state.y,draw:()=>{ellipse(ctx,state.x,state.y+1,20,9,'#c0e57377');person(ctx,state,walkPhase,wasMoving)}});layers.sort((first,second)=>first.y-second.y).forEach(layer=>layer.draw());ctx.restore();
  mini.fillStyle=room.floor;mini.fillRect(0,0,332,216);mini.fillStyle=room.wall;for(const [,x,y,w,h] of room.items)mini.fillRect((x-80)/740*332,(y-130)/540*216,w/740*332,h/540*216);ellipse(mini,(state.x-80)/740*332,(state.y-130)/540*216,5,5,'#214d3a');mini.fillStyle='#f4edce';mini.fillRect(135,204,63,10);
 }
-function interact(){if(!started||!$('dialog').hidden||!$('creation').hidden||!nearby)return;if(nearby.type==='exhibit'){readExhibit(nearby.index);return}if(nearby.type==='hub'){openHub(nearby.entity);return}if(nearby.type==='exit'){leaveRoom();return}if(nearby.type==='station'){visit(buildings.find(building=>building.id===state.room));return}nearby.type==='npc'?talk(nearby.entity):enterRoom(nearby.entity)}
+function interact(){if(!started||!$('dialog').hidden||!$('creation').hidden||!nearby)return;if(nearby.type==='exhibit'){readExhibit(nearby.index);return}if(nearby.type==='hub'){openHub(nearby.entity);return}if(nearby.type==='exit'){leaveRoom();return}if(nearby.type==='station'){visit(findRoomBuilding());return}nearby.type==='npc'?talk(nearby.entity):enterRoom(nearby.entity)}
 function explore(){showDialog('YOUR NEIGHBOURHOOD','Where to?', '<p>Choose a place and your character will walk there. Press E or tap Enter at the door to go inside. If you are indoors, you will first step outside.</p>',buildings.map(building=>({label:building.icon+'  '+building.name,detail:building.tag,run:()=>{closeDialog();if(state.room)leaveRoom();route=findPath(state,building.door);target=route.length?building:null;if(!route.length)toast('Walk closer to a clear path and try again.');refresh()}})))}
 function myLife(){const friends=Object.values(state.relations).filter(value=>value>0).length;showDialog('YOUR STORY SO FAR','Life in Lagos','<div class="stats-grid"><div class="stat-tile">Career<b>'+state.job+'</b></div><div class="stat-tile">Home<b>'+state.housing+'</b></div><div class="stat-tile">Vehicle<b>'+(state.vehicle?'Toyota Corolla':'On foot')+'</b></div><div class="stat-tile">Experience<b>'+state.xp+' XP · Level '+level()+'</b></div><div class="stat-tile">Neighbours met<b>'+friends+' / '+npcs.length+'</b></div><div class="stat-tile">Shifts completed<b>'+state.totalShifts+'</b></div></div><p>First chapter: meet a neighbour, complete a shift, and rent an apartment. '+(state.questClaimed?'Reward collected!':'Reward: ₦3,000 + 100 XP.')+'</p>',[...(state.vehicle?[{label:state.driving?'Park and walk':'Drive your Corolla',detail:state.room?'Step outside to use your car.':'Drive around the neighbourhood at a faster speed',disabled:!!state.room,run:()=>{state.driving=!state.driving;toast(state.driving?'You are now driving.':'Parked. Back on your feet.');closeDialog()}}]:[]),{label:'Explore the neighbourhood',run:explore}])}
 function exportSave(){save();const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'}),link=document.createElement('a'),url=URL.createObjectURL(blob);link.href=url;link.download='naija-life-day-'+state.day+'.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);toast('Save exported. Keep it to continue on another browser.')}
@@ -283,7 +284,7 @@ function render(){
 }
 function drawMinimap(){mini.clearRect(0,0,332,216);mini.fillStyle='#d8dfc4';mini.fillRect(0,0,332,216);const sx=332/WORLD.w,sy=216/WORLD.h;mini.fillStyle='#a5b29c';mini.fillRect(10,477*sy,312,135*sy);mini.fillRect(10,983*sy,312,107*sy);mini.fillRect(883*sx,20,99*sx,177);for(const building of buildings){mini.fillStyle=building.roof;mini.fillRect(building.x*sx,building.y*sy,building.w*sx,building.h*sy)}mini.fillStyle='#699eaf';mini.fillRect(0,1240*sy,332,55*sy);mini.fillStyle='#ece1ba';mini.fillRect(875*sx,1220*sy,120*sx,105*sy);if(typeof regionHubs!=='undefined')for(const hub of regionHubs)ellipse(mini,hub.x*sx,hub.y*sy,4,4,'#dbac59');for(const npc of npcs)ellipse(mini,npc.x*sx,npc.y*sy,2.5,2.5,'#7c6675');ellipse(mini,state.x*sx,state.y*sy,6,6,'#f9f8e9');ellipse(mini,state.x*sx,state.y*sy,4,4,'#224b3e');if(target?.w){mini.strokeStyle='#305444';mini.lineWidth=2;mini.strokeRect(target.x*sx-3,target.y*sy-3,target.w*sx+6,target.h*sy+6)}}
 function findNearby(){
- if(state.room){const building=buildings.find(item=>item.id===state.room),room=roomLayouts[state.room];nearby=Math.hypot(state.x-450,state.y-643)<72?{type:'exit'}:Math.hypot(state.x-room.station.x,state.y-room.station.y)<86?{type:'station'}:null;$('interact').disabled=!nearby;$('interact').lastElementChild.textContent=nearby?.type==='exit'?'Exit to street':room.spot;$('district').textContent='⌂ '+building.name;document.querySelector('.map-label').firstChild.textContent='INDOORS ';document.querySelector('.map-label span').textContent='ROOM';return}
+ if(state.room){const building=findRoomBuilding(),room=roomLayouts[state.room];nearby=Math.hypot(state.x-450,state.y-643)<72?{type:'exit'}:Math.hypot(state.x-room.station.x,state.y-room.station.y)<86?{type:'station'}:null;$('interact').disabled=!nearby;$('interact').lastElementChild.textContent=nearby?.type==='exit'?'Exit to street':room.spot;$('district').textContent='⌂ '+building.name;document.querySelector('.map-label').firstChild.textContent='INDOORS ';document.querySelector('.map-label span').textContent='ROOM';return}
  document.querySelector('.map-label').firstChild.textContent='YABA ';document.querySelector('.map-label span').textContent='LAGOS, NG';let best=null,distance=88;for(const building of buildings){const next=Math.hypot(state.x-building.door.x,state.y-building.door.y);if(next<distance){distance=next;best={type:'building',entity:building}}}for(const npc of npcs){const next=Math.hypot(state.x-npc.x,state.y-npc.y);if(next<Math.min(distance,75)){distance=next;best={type:'npc',entity:npc}}}nearby=best;$('interact').disabled=!best;$('interact').lastElementChild.textContent=best?(best.type==='npc'?'Talk to '+best.entity.name:'Enter '+best.entity.name):'Interact';$('district').textContent=state.driving?'⌖ Cruising through Yaba':'⌖ Yaba neighbourhood';
 }
 function update(dt){
@@ -414,9 +415,10 @@ function person3D(buffer,entity,phase,moving){
 function car3D(buffer,x,z,color,turn=0,bus=false){const cosine=Math.cos(turn),sine=Math.sin(turn),elevation=!state.room&&z>1210&&z<1325&&x>875&&x<995?14:0,box=(px,py,pz,w,h,d,hex)=>meshBox(buffer,x+px*cosine+pz*sine,py+elevation,z-px*sine+pz*cosine,w,h,d,hex,turn),length=bus?88:66;box(0,15,0,length,19,33,color);box(bus?-5:-3,30,0,bus?57:35,19,29,'#567a80');box(bus?-5:-3,41,0,bus?59:37,5,31,color);for(const px of [-length*.32,length*.32])for(const pz of [-18,18])box(px,8,pz,13,15,5,'#34413e');box(length/2+1,18,-10,2,7,7,'#fff1be');box(length/2+1,18,10,2,7,7,'#fff1be');if(bus)box(0,19,17,length-6,3,1,'#4f5038')}
 function buildScene3D(){
  const buffer=[];view3D.labels=[];
- if(state.room){const room=roomLayouts[state.room],building=buildings.find(item=>item.id===state.room);meshBox(buffer,450,-5,435,740,10,460,room.floor);meshBox(buffer,450,60,207,740,120,12,room.wall);meshBox(buffer,88,28,435,12,56,460,room.wall);meshBox(buffer,812,28,435,12,56,460,room.wall);view3D.labels.push({text:building.name,x:450,y:153,z:207});
+ if(state.room){const room=roomLayouts[state.room],building=findRoomBuilding();meshBox(buffer,450,-5,435,740,10,460,room.floor);meshBox(buffer,450,60,207,740,120,12,room.wall);meshBox(buffer,88,28,435,12,56,460,room.wall);meshBox(buffer,812,28,435,12,56,460,room.wall);view3D.labels.push({text:building.name,x:450,y:153,z:207});
   for(let line=100;line<805;line+=60)meshBox(buffer,line,.4,435,1,1,450,'#e5dcc0');for(let line=215;line<660;line+=50)meshBox(buffer,450,.4,line,710,1,1,'#e5dcc0');
   for(const [type,x,z,w,d] of room.items){const centerX=x+w/2,centerZ=z+d/2;
+   if(typeof roomItem3D==='function'&&roomItem3D(buffer,type,x,z,w,d))continue;
    if(type==='car'){car3D(buffer,centerX,centerZ,'#dfcda6');continue}if(type==='plant'){tree3D(buffer,centerX,centerZ,.55);continue}
    if(type==='bed'){meshBox(buffer,centerX,14,centerZ,w,28,d,'#977555');meshBox(buffer,centerX,33,centerZ,w-8,12,d-8,'#efe7ce');meshBox(buffer,centerX,42,centerZ+20,w-12,6,d-48,'#789f83');meshBox(buffer,centerX,44,z+22,w-25,10,28,'#fff5d9')}
    else if(type==='sofa'){meshBox(buffer,centerX,20,centerZ,w,40,d,'#76977f');meshBox(buffer,centerX,46,z+8,w,45,16,'#60836e');meshBox(buffer,x+8,35,centerZ,16,45,d,'#60836e');meshBox(buffer,x+w-8,35,centerZ,16,45,d,'#60836e')}
@@ -537,7 +539,7 @@ function findHubNearby(){
 function travelMenu(){
  syncRegion();showDialog('EXPLORE NIGERIA','Where next?','<p>Seven connected, stylised hubs: city streets, a village, culture courtyards, airports, and trade routes. Benue is represented by Makurdi. Prices and travel times are game values.</p><div class="badge">Currently in '+region().name+'</div>',Object.entries(regions).map(([id,area])=>({label:area.name+(id===state.region?' · you are here':''),detail:area.subtitle,run:()=>id===state.region?localHubs():travelOptions(id)})));
 }
-function travelOptions(id){const area=regions[id];showDialog('TRAVEL TO '+area.name.toUpperCase(),area.name,'<p>'+area.subtitle+'. Your money, career, home unlock, vehicle, and cargo travel with you. Flights use a simplified regional connection system, not real routes or schedules.</p>',[{label:'Coach · ₦300',detail:'6 game hours · arrive in the neighbourhood',disabled:availableFunds()<300,run:()=>travelTo(id,'coach',300,360)},...(id!=='village'&&state.region!=='village'?[{label:'Flight · ₦1,500',detail:'2 game hours · arrive at the airport',disabled:availableFunds()<1500,run:()=>travelTo(id,'flight',1500,120)}]:[]),{label:'Slow journey · free',detail:'12 game hours · travel without spending money',run:()=>travelTo(id,'coach',0,720)},{label:'Back to destinations',run:travelMenu}])}
+function travelOptions(id){const area=regions[id];showDialog('TRAVEL TO '+area.name.toUpperCase(),area.name,'<p>'+area.subtitle+'. Your money, career, home unlock, vehicle, and cargo travel with you. Flights use a simplified regional connection system, not real routes or schedules.</p>',[{label:'Coach · ₦300',detail:'6 game hours · arrive in the neighbourhood',disabled:availableFunds()<300,run:()=>travelTo(id,'coach',300,360)},...(id!=='village'&&state.region!=='village'?[{label:'Flight · ₦1,500',detail:'2 game hours · arrive at the airport',disabled:availableFunds()<1500,run:()=>travelTo(id,'flight',1500,120)}]:[]),...(typeof trainOption==='function'?trainOption(id):[]),{label:'Slow journey · free',detail:'12 game hours · travel without spending money',run:()=>travelTo(id,'coach',0,720)},{label:'Back to destinations',run:travelMenu}])}
 function travelTo(id,mode,cost,minutes){if(!pay(cost))return;closeDialog();state.room=null;state.driving=false;state.region=id;route=[];target=null;portalCooldown=.8;state.x=mode==='flight'?1880:272;state.y=mode==='flight'?150:472;advance(minutes);syncRegion();if(typeof view3D!=='undefined'){view3D.scene=null;view3D.focus={x:state.x,z:state.y}}camera={x:state.x,y:state.y};npcs.forEach((npc,index)=>{npc.x=npcDefs[index].x;npc.y=npcDefs[index].y;npc.route=[]});findNearby();findHubNearby();refresh();save();toast('Welcome to '+region().name+'! Use Travel to find the local landmarks.')}
 function walkToHub(hub){closeDialog();if(state.room)leaveRoom();route=findPath(state,hub);target=route.length?{...hub,name:hubName(hub)}:null;refresh();if(!route.length)toast('Move to a clear path, then try again.')}
 function localHubs(){showDialog(region().name.toUpperCase(),'Local landmarks','<p>Walk to a marker, then press E or tap the green button. Cross the river using the bridge in the centre of the southern edge of the map.</p>',[...regionHubs.map(hub=>({label:hubName(hub),detail:hub.poi?hub.poi.tag:hub.id==='culture'?region().craft:hub.id==='trade'?'Buy goods, inspect cargo, and arrange coastal exports':'Transport connections',run:()=>walkToHub(hub)})),{label:region().bridge,detail:'Walk across the river · southern edge',run:()=>{closeDialog();if(state.room)leaveRoom();route=findPath(state,{x:935,y:1315});target=route.length?{name:region().bridge}:null;refresh()}},{label:'Travel to another region',run:travelMenu}])}
@@ -692,7 +694,7 @@ function showCityMap(selected=null){
  for(const x of [450,1380])for(const road of [484,990])for(let stripe=0;stripe<7;stripe++)shape('rect',{x,y:road+stripe*16,width:43,height:8,fill:'#f6efd8'});
  for(const y of [650,950])for(let stripe=0;stripe<7;stripe++)shape('rect',{x:888+stripe*14,y:y-22,width:8,height:44,fill:'#f6efd8'});
  const destinations=[...buildings.map(building=>({name:building.name,point:building.door,building})),...regionHubs.map(hub=>({name:hubName(hub),point:hub,hub}))];
- const currentBuilding=buildings.find(building=>building.id===state.room),position=currentBuilding?currentBuilding.door:{x:state.x,y:state.y};
+ const currentBuilding=findRoomBuilding(),position=currentBuilding?currentBuilding.door:{x:state.x,y:state.y};
  let preview=[];
  if(selected!==null){const previousRoom=state.room;try{state.room=null;preview=findPath(position,destinations[selected].point)}finally{state.room=previousRoom}if(preview.length)shape('polyline',{points:[position,...preview].map(point=>point.x+','+point.y).join(' '),fill:'none',stroke:'#f0a43b','stroke-width':17,'stroke-linejoin':'round'})}
  buildings.forEach(building=>shape('rect',{x:building.x,y:building.y,width:building.w,height:building.h,rx:16,fill:building.color,stroke:'#62745e','stroke-width':5}));
@@ -1519,7 +1521,7 @@ function ferryActions(p,again){
 function districtDialog(){
  const here=state.district||'mainland';
  const opts=[['mainland','Lagos Mainland','Yaba, Ikeja & Surulere: bungalows, markets and the National Theatre'],['island','Lagos Island','Marina, Balogun Market and Broad Street: dense old Lagos'],['vi','Victoria Island & Lekki','Glass towers, Landmark Beach and the Lekki coast']];
- showDialog('LAGOS','Which part of Lagos?','<p>Cross the Third Mainland Bridge to another district. Each has its own streets, buildings, venues and billboards.</p>',opts.filter(o=>o[0]!==here).map(o=>({label:o[1]+' · ₦800',detail:o[2]+' · 40 min',disabled:availableFunds()<800,run:()=>{if(!pay(800,'Bridge toll & ride'))return;closeDialog();advance(40);setDistrict(o[0]);toast('Welcome to '+o[1]+'.')}})));
+ showDialog('LAGOS','Which part of Lagos?','<p>Cross the Third Mainland Bridge to another district. Each has its own streets, buildings, venues and billboards.</p>',[...(typeof trainDistrictOption==='function'?trainDistrictOption(here):[]),...opts.filter(o=>o[0]!==here).map(o=>({label:o[1]+' · ₦800',detail:o[2]+' · 40 min',disabled:availableFunds()<800,run:()=>{if(!pay(800,'Bridge toll & ride'))return;closeDialog();advance(40);setDistrict(o[0]);toast('Welcome to '+o[1]+'.')}}))]);
 }
 function poiDialog(hub){
  const p=hub.poi;const again=()=>poiDialog(hub);
@@ -1628,7 +1630,6 @@ function tower3D(buffer,x,z){
 const previousBuildRegionUtil=buildRegion3D;
 buildRegion3D=function(buffer){
  previousBuildRegionUtil(buffer);const cfg=UTIL[state.region]||UTIL.lagos;
- for(const z of [462,1106]){let prev=null,index=0;for(let x=70;x<=1960;x+=cfg.spacing){const crossing=(x>835&&x<1035)||(x>425&&x<515)||(x>1355&&x<1445);if(crossing)continue;const tall=index%4===0;pole3D(buffer,x,z,index%3===1,tall);if(prev!==null)wires3D(buffer,prev.x,x,z,cfg.wires,prev.top<x?98:98);prev={x,top:98};index++}}
  for(const [x,z] of cfg.towers)tower3D(buffer,x,z);
 };
 /* Security guards at the door of every building interior (except home) */
@@ -1666,11 +1667,11 @@ render=function(){previousRenderGuard();if(!started||!state.room||state.room==='
 const RIDE_STYLE={calabar:['Blue & white cab','#2f6fc4'],lagos:['Yellow cab','#e8b92f'],portharcourt:['City cab','#c8503c'],sokoto:['Keke','#2f8a4b'],enugu:['City cab','#c8503c'],benue:['Keke','#2f8a4b'],village:['Okada','#c8503c']};
 let rideToken=0;
 function rideDestinations(){
- const out=[];for(const b of buildings)out.push({name:b.name,x:b.door.x,y:b.door.y+20,group:'Buildings'});
- for(const hub of regionHubs){const label=hub.poi?(hub.poi.opts?.districts?null:hub.poi.tag):hub.id==='airport'||hub.id==='coach'?'Transport':hub.id==='trade'?'Port & depot':'Culture';if(label)out.push({name:hubName(hub),x:hub.x,y:hub.y,group:label})}
+ const out=[];for(const b of buildings)out.push({name:b.name,x:b.door.x,y:b.door.y+20,group:'Buildings',enter:b});
+ for(const hub of regionHubs){const label=hub.poi?(hub.poi.opts?.districts?null:hub.poi.tag):hub.id==='airport'||hub.id==='coach'?'Transport':hub.id==='trade'?'Port & depot':'Culture';if(label)out.push({name:hubName(hub),x:hub.x,y:hub.y,group:label,enter:hub.vb||null})}
  return out;
 }
-function rideQuote(dest){const from=state.room?(buildings.find(b=>b.id===state.room)?.door||{x:state.x,y:state.y}):{x:state.x,y:state.y},dist=Math.hypot(dest.x-from.x,dest.y-from.y),fare=Math.max(400,Math.round((300+dist*.5)/50)*50),minutes=Math.round(8+dist/70);return {dist,fare,minutes}}
+function rideQuote(dest){const from=state.room?(findRoomBuilding()?.door||{x:state.x,y:state.y}):{x:state.x,y:state.y},dist=Math.hypot(dest.x-from.x,dest.y-from.y),fare=Math.max(400,Math.round((300+dist*.5)/50)*50),minutes=Math.round(8+dist/70);return {dist,fare,minutes}}
 function rideMenu(){
  if(typeof started!=='undefined'&&!started)return;
  const [vehicle,color]=RIDE_STYLE[state.region]||RIDE_STYLE.lagos,dests=rideDestinations().map(d=>({...d,...rideQuote(d)})).filter(d=>d.dist>90).sort((a,b)=>a.dist-b.dist);
@@ -1683,7 +1684,7 @@ function rideTrip(vehicle,dest){
  const start=performance.now();
  const step=()=>{if(token!==rideToken||$('dialog').hidden)return;const progress=Math.min(100,(performance.now()-start)/22),bar=document.querySelector('.journey-progress');if(bar)bar.value=progress;if(progress<100){requestAnimationFrame(step);return}
   closeDialog();if(!pay(dest.fare,vehicle+' fare')){toast('Not enough money for the fare.');return}
-  advance(dest.minutes);const wasIn=!!state.room;state.room=null;state.driving=false;state.x=dest.x;state.y=dest.y;state.facing='down';route=[];target=null;camera={x:dest.x,y:dest.y};if(typeof view3D!=='undefined'){view3D.scene=null;view3D.focus={x:dest.x,z:dest.y}}portalCooldown=.8;findNearby();findHubNearby();refresh();save();toast('Dropped off at '+dest.name+' · '+money(dest.fare))};
+  advance(dest.minutes);const wasIn=!!state.room;state.room=null;state.driving=false;state.x=dest.x;state.y=dest.y;state.facing='down';route=[];target=null;camera={x:dest.x,y:dest.y};if(typeof view3D!=='undefined'){view3D.scene=null;view3D.focus={x:dest.x,z:dest.y}}portalCooldown=.8;findNearby();findHubNearby();refresh();save();if(dest.enter){enterRoom(dest.enter);toast('Dropped off at '+dest.name+' · '+money(dest.fare)+' · you are inside')}else toast('Dropped off at '+dest.name+' · '+money(dest.fare))};
  requestAnimationFrame(step);
 }
 (()=>{const bottom=document.querySelector('.bottom'),button=document.createElement('button');button.className='nav-btn';button.id='ride-btn';button.setAttribute('aria-label','Order a ride');button.textContent='🚕 Ride';button.onclick=rideMenu;(document.getElementById('missions-btn')||document.getElementById('life')).after(button)})();
@@ -1691,5 +1692,272 @@ addEventListener('keydown',event=>{if((event.key==='r'||event.key==='R')&&!event
 
 </script>
 <!--/ch:rides.js-->
+<!--ch:enter.js-->
+<script>
+/* Walk-in interiors for hospitals, gyms, hotels and other venues */
+const ENTERABLE=new Set(['clinic','gym','hotel','mall','police','school','church','mosque','museum','spa']);
+const virtualBuildings=[];
+function findRoomBuilding(){return buildings.find(b=>b.id===state.room)||virtualBuildings.find(b=>b.id===state.room)}
+const KIND_ROOMS={
+ clinic:{floor:'#e8efe9',wall:'#8fbfb4',staff:'Nurse',spot:'See the nurse',items:[['counter',290,265,320,75],['hbed',120,420,110,95],['hbed',270,420,110,95],['hbed',620,420,110,95],['plant',730,250,50,50]],station:{x:450,y:390}},
+ gym:{floor:'#3b4144',wall:'#25292b',staff:'Trainer',spot:'Train & smoothie bar',items:[['counter',560,250,210,70],['treadmill',130,255,70,105],['treadmill',225,255,70,105],['treadmill',320,255,70,105],['rack',125,430,230,60],['bench',620,430,130,55]],station:{x:450,y:390}},
+ hotel:{floor:'#e6dcc6',wall:'#8d9a96',staff:'Receptionist',spot:'Hotel desk',items:[['counter',290,265,320,75],['sofa',120,420,170,70],['sofa',610,420,170,70],['plant',730,250,50,50],['plant',110,250,50,50]],station:{x:450,y:390}},
+ mall:{floor:'#d9d4c5',wall:'#7fb0bd',staff:'Concierge',spot:'Shops & cinema',items:[['shelf',120,265,110,190],['shelf',670,265,110,190],['counter',330,265,240,70],['plant',420,470,50,50]],station:{x:450,y:400}},
+ police:{floor:'#c9d0d6',wall:'#5d7388',staff:'Desk sergeant',spot:'Speak to the desk',items:[['counter',290,265,320,75],['desk',130,430,150,65],['desk',620,430,150,65]],station:{x:450,y:390}},
+ school:{floor:'#e3c98a',wall:'#b79a62',staff:'Teacher',spot:'Evening class',items:[['desk',130,300,120,55],['desk',290,300,120,55],['desk',450,300,120,55],['desk',610,300,120,55],['desk',130,430,120,55],['desk',610,430,120,55]],station:{x:450,y:430}},
+ church:{floor:'#d9cdb8',wall:'#b3a58b',staff:'Usher',spot:'Join the gathering',items:[['pew',140,350,200,40],['pew',560,350,200,40],['pew',140,430,200,40],['pew',560,430,200,40],['counter',350,235,200,55]],station:{x:450,y:420}},
+ mosque:{floor:'#ebe5d4',wall:'#b6c9bf',staff:'Caretaker',spot:'Quiet reflection',items:[['rug',150,300,220,150],['rug',530,300,220,150],['plant',730,250,50,50]],station:{x:450,y:410}},
+ museum:{floor:'#e8dcc4',wall:'#9a7b5f',staff:'Guide',spot:'Guided tour',items:[['table',150,285,115,50],['table',330,285,115,50],['table',510,285,115,50],['table',230,430,115,50],['table',460,430,115,50]],station:{x:450,y:380}},
+ spa:{floor:'#efe9dc',wall:'#7ec0d4',staff:'Therapist',spot:'Spa treatments',items:[['bed',130,250,150,170],['bed',620,250,150,170],['counter',330,265,240,70],['plant',420,470,50,50]],station:{x:450,y:420}}
+};
+function roomItem3D(buffer,type,x,z,w,d){
+ const cx=x+w/2,cz=z+d/2,box=(px,py,pz,W,H,D,c)=>meshBox(buffer,px,py,pz,W,H,D,c);
+ if(type==='hbed'){box(cx,14,cz,w,10,d,'#c9d2d4');box(cx,24,cz,w-6,10,d-6,'#f6f8f6');box(cx,31,cz-d*.28,w-20,8,26,'#ffffff');box(cx,36,cz+d*.2,w-10,3,d*.5,'#6fb4b8');box(cx,22,z+d,w,26,5,'#9aa6a8');return true}
+ if(type==='treadmill'){box(cx,8,cz,w-10,10,d,'#2d3234');box(cx,12,cz,w-18,3,d-10,'#4a5256');box(cx,38,z+10,w-14,60,8,'#1f2224');box(cx,66,z+12,w-20,14,8,'#c0e573');box(cx-w*.35,34,z+d*.3,3,52,3,'#8a9396');box(cx+w*.35,34,z+d*.3,3,52,3,'#8a9396');return true}
+ if(type==='rack'){box(cx,6,cz,w,12,d,'#2d3234');for(let i=0;i<6;i++){box(x+14+i*(w-28)/5,26,cz,5,40,5,'#8a9396');box(x+14+i*(w-28)/5,50,cz,16,10,10,['#c0e573','#d9531e','#f1c24a'][i%3])}return true}
+ if(type==='bench'){box(cx,12,cz,w,12,d,'#3a3f42');box(cx,22,cz,w-8,8,d-8,'#c0e573');box(cx-w*.45,30,cz,4,36,4,'#8a9396');box(cx+w*.45,30,cz,4,36,4,'#8a9396');box(cx,58,cz,w*.9,4,4,'#a8b0b3');return true}
+ if(type==='pew'){box(cx,10,cz,w,20,d,'#7a5846');box(cx,32,z+4,w,30,5,'#6a4a3a');return true}
+ if(type==='rug'){box(cx,1.2,cz,w,2.4,d,'#2f7f6b');box(cx,2.4,cz,w-14,1.2,d-14,'#e8dcc4');for(let i=0;i<3;i++)box(cx,3,z+25+i*(d-50)/2,w-30,1,3,'#2f7f6b');return true}
+ return false;
+}
+function rebuildVirtual(){
+ virtualBuildings.length=0;
+ for(const hub of regionHubs){const p=hub.poi;if(!p||!ENTERABLE.has(p.kind))continue;const id='poi_'+p.id.replace(/\W+/g,'_'),vb={id,name:p.name,virtual:true,poi:p,door:{x:hub.x,y:hub.y-12},icon:'✚',tag:p.tag,sign:p.name.toUpperCase(),color:'#d9d4c5',roof:'#7a8570',desc:p.desc,x:hub.x-40,y:hub.y-50,w:80,h:50};roomLayouts[id]=KIND_ROOMS[p.kind];virtualBuildings.push(vb);hub.vb=vb}
+}
+const previousRefreshEnter=refreshPlaces;refreshPlaces=function(){previousRefreshEnter();rebuildVirtual()};
+placesKey=null;refreshPlaces();
+const previousVisit=visit;visit=function(building){if(building&&building.virtual){poiDialog({poi:building.poi});return}previousVisit(building)};
+const previousOpenHubEnter=openHub;
+openHub=function(hub){if(hub.vb){enterRoom(hub.vb);return}previousOpenHubEnter(hub)};
+const previousEnterRoomVirtual=enterRoom;
+enterRoom=function(building){if(building.virtual)state.poiExit={x:building.door.x,y:building.door.y+25};previousEnterRoomVirtual(building)};
+const previousFindHubNearby=findHubNearby;
+findHubNearby=function(){previousFindHubNearby();if(nearby?.type==='hub'&&nearby.entity.vb){$('interact').lastElementChild.textContent='Enter '+nearby.entity.poi.name}};
+const previousBuildRegionEnter=buildRegion3D;
+buildRegion3D=function(buffer){previousBuildRegionEnter(buffer);for(const hub of regionHubs)if(hub.vb)view3D.labels.push({text:'ENTER ↓',x:hub.x,y:32,z:hub.y})};
+/* walk onto the marker to go inside */
+const previousRenderEnter=render;
+render=function(){previousRenderEnter();if(!started||state.room||portalCooldown!==0||!wasMoving)return;for(const hub of regionHubs)if(hub.vb&&Math.hypot(state.x-hub.x,state.y-hub.y)<22){enterRoom(hub.vb);break}};
+const previousNormalizeEnter=normalize;
+normalize=function(data){const clean=previousNormalizeEnter(data);if(typeof data.room==='string'&&data.room.startsWith('poi_')){clean.room=null;const e=data.poiExit;clean.x=Number.isFinite(e?.x)?e.x:272;clean.y=Number.isFinite(e?.y)?e.y:472;if(outdoorBlocked(clean.x,clean.y)){clean.x=272;clean.y=472}}clean.poiExit=null;return clean};
+
+</script>
+<!--/ch:enter.js-->
+<!--ch:trip.js-->
+<script>
+/* Taxi and train cinematics (like the flight): you see the vehicle moving, the city style and the stations */
+const TRAIN_LINE=['portharcourt','enugu','benue'];
+const STATIONS={portharcourt:'Port Harcourt Railway Station',enugu:'Enugu Railway Station',benue:'Makurdi Railway Station','lagos-mainland':'Mile 2 Station · Blue Line','lagos-island':'Marina Station · Blue Line'};
+const TRIP_STYLE={
+ lagos:{b:['#c8b79a','#a9b9bd','#d1bc98','#b8c4c1'],roof:null,ground:'#a8c38a',tree:'palm',hills:'#9bb08a'},
+ village:{b:['#bd8d60','#b5865f'],roof:'#c9b36a',ground:'#b2c27d',tree:'leafy',hills:'#a1b678'},
+ calabar:{b:['#efe6d1','#f4ecd8'],roof:'#a4533f',ground:'#86b59a',tree:'palm',hills:'#76a58a'},
+ portharcourt:{b:['#a4b6b5','#8fa5a8','#b8c4c1'],roof:null,ground:'#83a99a',tree:'palm',hills:'#729a8c'},
+ sokoto:{b:['#c98a62','#bf7e57','#d19a6e'],roof:null,ground:'#d8c592',tree:'acacia',hills:'#cfae78',crown:true},
+ enugu:{b:['#cdb294','#d6bfa4'],roof:'#a24b3a',ground:'#92ae76',tree:'leafy',hills:'#7fa468'},
+ benue:{b:['#c4aa83','#b9a07a'],roof:'#cfa95a',ground:'#a8bd77',tree:'leafy',hills:'#97ad68'}
+};
+const tripStyle=()=>TRIP_STYLE[state.region]||TRIP_STYLE.lagos;
+const hash=(i,k=1)=>{const x=Math.sin(i*127.1+k*311.7)*43758.5453;return x-Math.floor(x)};
+let trip=null;
+const tripScreen=document.createElement('section');tripScreen.id='trip-screen';tripScreen.className='flight-screen';tripScreen.hidden=true;tripScreen.setAttribute('role','dialog');tripScreen.setAttribute('aria-modal','true');tripScreen.setAttribute('aria-labelledby','trip-route');
+tripScreen.innerHTML='<header class="flight-top"><div><small id="trip-kicker"></small><h2 id="trip-route"></h2></div><div class="flight-controls"><button id="trip-view"></button><button id="trip-pause">Pause</button><button id="trip-cancel">Cancel</button></div></header><div class="flight-stage"><canvas id="trip-canvas" aria-label="Animated journey"></canvas><div class="flight-caption"><span id="trip-step"></span><h3 id="trip-phase" aria-live="polite"></h3><span id="trip-detail"></span></div></div><footer class="flight-bottom"><div class="flight-stats"><span id="trip-a"></span><span id="trip-b"></span><span id="trip-c"></span></div><progress id="trip-progress" max="1" value="0" aria-label="Journey progress"></progress><div class="flight-footer"><small id="trip-note"></small><button id="trip-skip">Skip</button><button id="trip-arrive" class="flight-arrive" hidden>Get out</button></div></footer>';
+document.body.append(tripScreen);
+const T=id=>document.getElementById(id);
+/* speed profile and cumulative distance */
+const profile=(kind,p)=>{const a=kind==='train'?.10:.05,b=kind==='train'?.25:.14,c=kind==='train'?.78:.80,d=kind==='train'?.93:.94;const ss=x=>x*x*(3-2*x);return p<a?0:p<b?ss((p-a)/(b-a)):p<c?1:p<d?1-ss((p-c)/(d-c)):0};
+const cumulative=kind=>{const out=[0],n=400;for(let i=1;i<=n;i++)out.push(out[i-1]+profile(kind,i/n)/n);return out};
+const dist=(cum,p)=>{const f=p*400,i=Math.min(399,Math.floor(f));return cum[i]+(cum[i+1]-cum[i])*(f-i)};
+/* sound */
+function tripSound(kind){
+ if(!audioEngine)return null;const ctx=audioEngine.context;if(ctx.state==='suspended')ctx.resume?.();
+ const out=ctx.createGain();out.gain.value=0;out.connect(ctx.destination);
+ const buf=ctx.createBuffer(1,ctx.sampleRate*2,ctx.sampleRate),d=buf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
+ const src=ctx.createBufferSource();src.buffer=buf;src.loop=true;const low=ctx.createBiquadFilter();low.type='lowpass';low.frequency.value=kind==='train'?260:200;const g=ctx.createGain();src.connect(low).connect(g).connect(out);src.start();
+ const osc=ctx.createOscillator(),og=ctx.createGain(),olow=ctx.createBiquadFilter();osc.type='sawtooth';osc.frequency.value=kind==='train'?55:70;olow.type='lowpass';olow.frequency.value=300;osc.connect(olow).connect(og).connect(out);osc.start();
+ const tone=(f,t,len,lv)=>{const o=ctx.createOscillator(),gg=ctx.createGain();o.type='square';o.frequency.value=f;gg.gain.setValueAtTime(0,t);gg.gain.linearRampToValueAtTime(lv,t+.03);gg.gain.setValueAtTime(lv,t+len-.08);gg.gain.exponentialRampToValueAtTime(.0001,t+len);const lp=ctx.createBiquadFilter();lp.type='lowpass';lp.frequency.value=900;o.connect(lp).connect(gg).connect(out);o.start(t);o.stop(t+len+.05)};
+ const clack=()=>{const s=ctx.createBufferSource();s.buffer=buf;const hp=ctx.createBiquadFilter();hp.type='highpass';hp.frequency.value=900;const e=ctx.createGain(),t=ctx.currentTime;e.gain.setValueAtTime(.5,t);e.gain.exponentialRampToValueAtTime(.0001,t+.07);s.connect(hp).connect(e).connect(out);s.start(t);s.stop(t+.09)};
+ return {ctx,out,g,og,osc,tone,clack,horn(){const t=ctx.currentTime;tone(kind==='train'?311:392,t,.9,.14);tone(kind==='train'?370:494,t,.9,.12)},stop(){try{src.stop();osc.stop();out.disconnect()}catch{}}};
+}
+function startTrip(cfg){
+ if(trip)stopTrip(true);closeDialog();stopInput();route=[];target=null;document.body.classList.add('phone-open');
+ const kind=cfg.kind;trip={cfg,kind,t:0,paused:false,view:kind==='cab'?'inside':'outside',last:performance.now(),cum:cumulative(kind),sound:null,clackAcc:0,horned:{},arrived:false,frame:0,cars:Array.from({length:5},(_,i)=>({z:6+i*7+hash(i)*4,lane:i%2?1.5:-1.4,v:.35+hash(i,2)*.5,kind:i}))};
+ tripScreen.hidden=false;T('trip-kicker').textContent=cfg.kicker;T('trip-route').textContent=cfg.title;T('trip-view').textContent=kind==='cab'?'Outside view':'Window view';T('trip-pause').textContent='Pause';T('trip-arrive').hidden=true;T('trip-arrive').textContent=cfg.arriveLabel||'Get out';T('trip-skip').hidden=false;T('trip-skip').textContent=kind==='cab'?'Skip ride':'Skip to arrival';T('trip-note').textContent=cfg.note;T('trip-view').focus();
+ try{trip.sound=tripSound(kind)}catch{trip.sound=null}
+ const frame=now=>{if(!trip)return;const dt=Math.min(.1,(now-trip.last)/1000);trip.last=now;if(!trip.paused&&!document.hidden)trip.t=Math.min(cfg.seconds,trip.t+dt);drawTrip(dt);trip.frame=requestAnimationFrame(frame)};trip.frame=requestAnimationFrame(frame);
+}
+function stopTrip(silent){if(!trip)return;cancelAnimationFrame(trip.frame);const s=trip.sound;if(s){try{s.out.gain.setTargetAtTime(0,s.ctx.currentTime,.05)}catch{}setTimeout(()=>s.stop(),250)}trip=null;tripScreen.hidden=true;document.body.classList.remove('phone-open');stopInput();last=performance.now();if(!silent)document.getElementById('phone-open')?.focus()}
+T('trip-cancel').onclick=()=>stopTrip();
+T('trip-pause').onclick=()=>{if(!trip)return;trip.paused=!trip.paused;T('trip-pause').textContent=trip.paused?'Resume':'Pause'};
+T('trip-view').onclick=()=>{if(!trip)return;if(trip.kind==='cab'){trip.view=trip.view==='inside'?'outside':'inside';T('trip-view').textContent=trip.view==='inside'?'Outside view':'Inside the cab'}else{trip.view=trip.view==='outside'?'inside':'outside';T('trip-view').textContent=trip.view==='outside'?'Window view':'Outside view'}};
+T('trip-skip').onclick=()=>{if(trip)trip.t=trip.cfg.seconds};
+T('trip-arrive').onclick=()=>{if(!trip||!trip.arrived)return;const done=trip.cfg.onArrive;stopTrip(true);done()};
+tripScreen.addEventListener('keydown',e=>{if(e.key==='Escape'){e.stopPropagation();stopTrip()}});
+/* scenery */
+function drawSky(c,W,H,gy){const sk=skyState3D(),col=sk.color.map(v=>Math.round(Math.min(1,v*1.05)*255)),top=`rgb(${Math.round(col[0]*.78)},${Math.round(col[1]*.86)},${Math.round(col[2]*.98)})`,bot=`rgb(${Math.min(255,col[0]+30)},${Math.min(255,col[1]+26)},${Math.min(255,col[2]+14)})`;const g=c.createLinearGradient(0,0,0,gy);g.addColorStop(0,top);g.addColorStop(1,bot);c.fillStyle=g;c.fillRect(0,0,W,gy+2);if(sk.dark<.6){c.fillStyle='#f6e7b8';c.beginPath();c.arc(W*.82,H*.14,Math.min(W,H)*.045,0,7);c.fill()}else{c.fillStyle='#e9eefb';c.beginPath();c.arc(W*.82,H*.14,Math.min(W,H)*.03,0,7);c.fill()}return sk}
+function building2D(c,x,y,w,h,st,i){const col=st.b[i%st.b.length];c.fillStyle=col;c.fillRect(x,y-h,w,h);if(st.roof){c.fillStyle=st.roof;c.beginPath();c.moveTo(x-w*.06,y-h);c.lineTo(x+w/2,y-h-w*.22);c.lineTo(x+w*1.06,y-h);c.fill()}else{c.fillStyle='rgba(0,0,0,.12)';c.fillRect(x-2,y-h-4,w+4,5);if(st.crown){c.fillStyle=col;for(let k=0;k<5;k++)c.fillRect(x+k*w/5+2,y-h-9,w/10,6)}}
+ c.fillStyle='rgba(120,160,175,.85)';const cols=Math.max(2,Math.floor(w/26)),rows=Math.max(1,Math.floor(h/32));for(let r=0;r<rows;r++)for(let k=0;k<cols;k++)c.fillRect(x+8+k*(w-16)/cols,y-h+10+r*(h-20)/rows,Math.max(5,(w-16)/cols-8),Math.max(8,(h-20)/rows-12))}
+function tree2D(c,x,y,s,st){c.fillStyle='#7a5b3d';if(st.tree==='palm'){c.fillRect(x-2*s,y-60*s,4*s,60*s);c.fillStyle='#4f8a45';for(let k=0;k<6;k++){c.save();c.translate(x,y-60*s);c.rotate((k-2.5)*.55);c.fillRect(0,-3*s,30*s,5*s);c.restore()}}else if(st.tree==='acacia'){c.fillRect(x-2*s,y-40*s,4*s,40*s);c.fillStyle='#8a9a4f';c.beginPath();c.ellipse(x,y-48*s,30*s,9*s,0,0,7);c.fill()}else{c.fillRect(x-3*s,y-30*s,6*s,30*s);c.fillStyle='#5f8f4f';c.beginPath();c.arc(x,y-46*s,22*s,0,7);c.fill()}}
+function sideScenery(c,W,H,gy,scroll,st,sk){
+ drawSky(c,W,H,gy);
+ c.fillStyle=st.hills;c.beginPath();c.moveTo(0,gy);for(let x=0;x<=W;x+=40){const wx=x+scroll*.12;c.lineTo(x,gy-30-hash(Math.floor(wx/160),3)*60-Math.sin(wx/260)*18)}c.lineTo(W,gy);c.fill();
+ for(let layer=0;layer<2;layer++){const par=layer?.55:.3,sc=layer?1:.6,gap=layer?230:150;c.globalAlpha=layer?1:.85;const first=Math.floor((scroll*par)/gap)-1;for(let i=first;i<first+Math.ceil(W/gap)+4;i++){const x=i*gap-scroll*par+hash(i,5)*40,w=(60+hash(i,7)*60)*sc,h=(45+hash(i,9)*(layer?90:130))*sc;if(hash(i,11)<.35&&!layer)continue;building2D(c,x,gy,w,h,st,i)}}c.globalAlpha=1;
+ c.fillStyle=st.ground;c.fillRect(0,gy,W,H-gy);
+ const par=.9,gap=170,first=Math.floor((scroll*par)/gap)-1;for(let i=first;i<first+Math.ceil(W/gap)+3;i++){const x=i*gap-scroll*par+hash(i,13)*60;if(hash(i,15)<.3)continue;tree2D(c,x,gy+6,.9+hash(i,17)*.5,st)}
+ if(sk.dark>.45){c.fillStyle=`rgba(8,16,40,${sk.dark*.45})`;c.fillRect(0,0,W,H)}
+}
+function poles2D(c,W,gy,scroll,gap=330,h=120){const first=Math.floor(scroll/gap)-1;let prev=null;for(let i=first;i<first+Math.ceil(W/gap)+3;i++){const x=i*gap-scroll;c.fillStyle='#8e8a7e';c.fillRect(x-4,gy-h+22,8,h);c.fillStyle='#5a4636';c.fillRect(x-22,gy-h+26,44,4);if(prev!==null){c.strokeStyle='#33383a';c.lineWidth=1.2;for(const o of [-18,-6,6,18]){c.beginPath();c.moveTo(prev+o,gy-h+28);c.quadraticCurveTo((prev+x)/2+o,gy-h+28+22,x+o,gy-h+28);c.stroke()}}prev=x}}
+function cabSprite(c,x,y,s,region){const blue=region==='calabar',body=blue?'#2f6fc4':'#e8b92f';c.save();c.translate(x,y);c.scale(s,s);c.fillStyle='rgba(0,0,0,.25)';c.beginPath();c.ellipse(0,2,76,9,0,0,7);c.fill();c.fillStyle=body;c.beginPath();c.roundRect(-74,-36,148,32,9);c.fill();c.fillStyle=blue?'#f6f6f2':'#2b2b2b';c.beginPath();c.roundRect(-40,-62,84,30,10);c.fill();c.fillStyle=blue?'#2f6fc4':body;c.beginPath();c.roundRect(-34,-58,72,24,8);c.fill();c.fillStyle='#9fd0e0';c.fillRect(-28,-54,28,18);c.fillRect(6,-54,28,18);if(blue){c.fillStyle='#f6f6f2';c.fillRect(-72,-24,144,6);c.fillStyle='#f2c230';c.fillRect(-10,-72,20,10)}else{c.fillStyle='#2b2b2b';c.fillRect(-72,-24,144,5);c.fillStyle='#fff';c.fillRect(-12,-72,24,10)}c.fillStyle='#222';for(const wx of [-46,46]){c.beginPath();c.arc(wx,-4,15,0,7);c.fill();c.fillStyle='#8a9396';c.beginPath();c.arc(wx,-4,6,0,7);c.fill();c.fillStyle='#222'}c.fillStyle='#fff1be';c.fillRect(68,-28,8,8);c.restore()}
+function trainSprite(c,x,y,s,t,moving,coaches=3){
+ c.save();c.translate(x,y);c.scale(s,s);const total=coaches*190+210;let px=-total/2;
+ const wheel=(cx,r)=>{c.fillStyle='#1f2528';c.beginPath();c.arc(cx,0,r,0,7);c.fill();c.fillStyle='#8a9396';c.beginPath();c.arc(cx,0,r*.45,0,7);c.fill();c.strokeStyle='#c9d0d2';c.lineWidth=2.4;c.beginPath();const a=t*(moving?9:0);c.moveTo(cx+Math.cos(a)*r*.8,Math.sin(a)*r*.8);c.lineTo(cx-Math.cos(a)*r*.8,-Math.sin(a)*r*.8);c.stroke()};
+ // locomotive
+ c.fillStyle='#1f6f4a';c.beginPath();c.roundRect(px,-72,210,60,10);c.fill();c.fillStyle='#14372e';c.fillRect(px,-24,210,12);c.fillStyle='#f4f1e6';c.fillRect(px,-52,210,5);c.fillStyle='#9fd0e0';c.fillRect(px+22,-66,58,26);c.fillStyle='#14372e';c.fillRect(px+120,-86,38,16);c.fillRect(px+170,-80,24,10);c.fillStyle='#f2c230';c.fillRect(px+200,-60,10,14);c.fillStyle='#f4f1e6';c.font='bold 13px system-ui';c.fillText('NAIJA RAIL',px+98,-30);wheel(px+30,12);wheel(px+75,12);wheel(px+135,12);wheel(px+180,12);
+ px+=218;
+ for(let k=0;k<coaches;k++){c.fillStyle='#f1eee2';c.beginPath();c.roundRect(px,-76,184,64,8);c.fill();c.fillStyle='#1f6f4a';c.fillRect(px,-34,184,10);c.fillRect(px,-72,184,5);for(let w=0;w<5;w++){c.fillStyle='#8fc2cf';c.fillRect(px+14+w*34,-62,26,22);c.fillStyle='rgba(30,40,50,.55)';c.beginPath();c.arc(px+27+w*34,-46,5,0,7);c.fill();c.fillRect(px+22+w*34,-43,10,9)}wheel(px+28,11);wheel(px+60,11);wheel(px+124,11);wheel(px+156,11);c.fillStyle='#14372e';c.fillRect(px+184,-30,10,6);px+=194}
+ c.restore();
+}
+function stationBoard(c,x,gy,name,s=1){c.save();c.translate(x,gy);c.scale(s,s);c.fillStyle='#b9b3a0';c.fillRect(-260,-10,520,12);c.fillStyle='#e8e0c8';c.fillRect(-250,-96,500,10);c.fillStyle='#a4533f';c.beginPath();c.moveTo(-270,-96);c.lineTo(0,-130);c.lineTo(270,-96);c.fill();for(const px of [-220,-110,0,110,220]){c.fillStyle='#8e8a7e';c.fillRect(px-4,-96,8,88)}c.font='bold 16px system-ui';const tw=c.measureText(name.toUpperCase()).width+36;c.fillStyle='#14372e';c.fillRect(-tw/2,-176,tw,32);c.fillStyle='#c0e573';c.fillRect(-tw/2,-178,tw,3);c.fillStyle='#f6f1da';c.textAlign='center';c.fillText(name.toUpperCase(),0,-154);c.fillStyle='#6c7c80';c.fillRect(-4,-146,8,50);c.restore()}
+/* inside the cab: windshield perspective */
+function cabInside(c,W,H,p,sp,egoDist,st,sk,cfg){
+ const hy=H*.42,K=H*.55,camH=1.2,pr=(z,wx,wy=0)=>({x:W/2+wx*K/z,y:hy+(camH-wy)*K/z,s:K/z});
+ const shake=Math.sin(trip.t*18)*sp*1.2;c.save();c.translate(0,shake);
+ drawSky(c,W,H,hy);c.fillStyle=st.hills;c.beginPath();c.moveTo(0,hy);for(let x=0;x<=W;x+=50)c.lineTo(x,hy-14-hash(Math.floor((x+egoDist*8)/120),3)*26);c.lineTo(W,hy);c.fill();
+ c.fillStyle=st.ground;c.fillRect(0,hy,W,H);
+ const rw=3.2;c.fillStyle='#5d666a';const n0=pr(40,-rw),n1=pr(40,rw),f0=pr(1.05,-rw),f1=pr(1.05,rw);c.beginPath();c.moveTo(n0.x,n0.y);c.lineTo(n1.x,n1.y);c.lineTo(f1.x,f1.y);c.lineTo(f0.x,f0.y);c.fill();
+ c.fillStyle='#cbd4b2';for(const sd of [-1,1]){const a=pr(40,sd*rw),b=pr(40,sd*(rw+1.6)),d=pr(1.05,sd*(rw+1.6)),e=pr(1.05,sd*rw);c.beginPath();c.moveTo(a.x,a.y);c.lineTo(b.x,b.y);c.lineTo(d.x,d.y);c.lineTo(e.x,e.y);c.fill()}
+ // lane dashes
+ const zr=40,gap=2.4;for(let i=0;i<24;i++){const z=((i*gap-egoDist*5.5)%(zr)+zr)%zr+1.05;const a=pr(z,-.08),b=pr(z+gap*.45,.08);c.fillStyle='#efe8c8';c.beginPath();c.moveTo(a.x,a.y);c.lineTo(b.x,b.y+0);c.lineTo(pr(z+gap*.45,-.08).x,b.y);c.lineTo(pr(z,.08).x,a.y);c.fill()}
+ // objects sorted far->near
+ const items=[];const span=44,gapB=5.2,base=egoDist*5.5;for(let i=0;i<9;i++){const z=((i*gapB-base)%span+span)%span+1.6;for(const sd of [-1,1]){const seed=i*2+(sd>0?1:0);items.push({z,kind:hash(seed,4)<.7?'b':'t',sd,seed})}}
+ for(const car of trip.cars){const cz=((car.z+(car.v-sp*1.1)*trip.t*3)%span+span)%span+1.6;items.push({z:cz,kind:'c',car})}
+ const polesZ=[];for(let i=0;i<8;i++){polesZ.push(((i*6.2-base)%span+span)%span+1.4)}
+ items.sort((a,b)=>b.z-a.z);
+ for(const it of items){if(it.kind==='b'){const bw=3.2+hash(it.seed,8)*2,bh=2.4+hash(it.seed,9)*(st.roof?2:5);const q=pr(it.z,it.sd*(rw+2.4+bw/2));const w=bw*q.s,h=bh*q.s;building2D(c,q.x-w/2,q.y,w,h,st,it.seed)}
+  else if(it.kind==='t'){const q=pr(it.z,it.sd*(rw+1.2));tree2D(c,q.x,q.y,q.s/K*5.2,st)}
+  else{const car=it.car,q=pr(it.z,car.lane),s=q.s/K*3.2,w=60*s*K/60;const blue=state.region==='calabar'&&car.kind%2===0,col=blue?'#2f6fc4':['#e8b92f','#c8503c','#d9d4cb','#586a60','#e8b92f'][car.kind%5];c.fillStyle='rgba(0,0,0,.25)';c.fillRect(q.x-40*s*1.2,q.y-2*s,80*s*1.2,6*s);c.fillStyle=col;c.beginPath();c.roundRect(q.x-38*s*1.2,q.y-34*s*1.2,76*s*1.2,26*s*1.2,5*s);c.fill();c.fillStyle=blue?'#f6f6f2':'rgba(30,40,50,.9)';c.fillRect(q.x-26*s*1.2,q.y-50*s*1.2,52*s*1.2,17*s*1.2);c.fillStyle='#ff4a3a';c.fillRect(q.x-34*s*1.2,q.y-26*s*1.2,10*s*1.2,6*s*1.2);c.fillRect(q.x+24*s*1.2,q.y-26*s*1.2,10*s*1.2,6*s*1.2);c.fillStyle='#222';c.fillRect(q.x-34*s*1.2,q.y-8*s*1.2,12*s*1.2,8*s*1.2);c.fillRect(q.x+22*s*1.2,q.y-8*s*1.2,12*s*1.2,8*s*1.2)}}
+ c.restore();
+ // windshield frame, dash, driver
+ const dashY=H*.74;c.fillStyle='#1c2023';c.fillRect(0,0,W*.06,H);c.fillRect(W*.94,0,W*.06,H);c.fillRect(0,0,W,H*.05);c.beginPath();c.moveTo(0,0);c.lineTo(W*.12,0);c.lineTo(W*.02,H*.7);c.lineTo(0,H*.7);c.fill();c.beginPath();c.moveTo(W,0);c.lineTo(W*.88,0);c.lineTo(W*.98,H*.7);c.lineTo(W,H*.7);c.fill();
+ const dg=c.createLinearGradient(0,dashY,0,H);dg.addColorStop(0,'#2a2f33');dg.addColorStop(1,'#14171a');c.fillStyle=dg;c.fillRect(0,dashY,W,H-dashY);c.fillStyle=state.region==='calabar'?'#2f6fc4':'#e8b92f';c.fillRect(0,dashY,W,5);
+ // driver (left of centre), head and shoulders from behind
+ const dx=W*.34;c.fillStyle='#2b3340';c.beginPath();c.ellipse(dx,H*.88,W*.15,H*.2,0,Math.PI,0);c.fill();c.fillStyle='#593621';c.beginPath();c.arc(dx,H*.58+Math.sin(trip.t*2)*2,W*.043,0,7);c.fill();c.fillStyle='#252d38';c.beginPath();c.ellipse(dx,H*.545+Math.sin(trip.t*2)*2,W*.047,H*.03,0,Math.PI,0);c.fill();c.fillRect(dx-W*.047,H*.545,W*.094,H*.012);
+ c.fillStyle='#14171a';c.beginPath();c.ellipse(dx,H*.84,W*.09,H*.06,0,0,7);c.fill();c.strokeStyle='#454c52';c.lineWidth=H*.012;c.beginPath();c.ellipse(dx,H*.84,W*.09,H*.06,0,0,7);c.stroke();
+ // meter and mirror
+ c.fillStyle='#0b1d13';c.beginPath();c.roundRect(W*.56,dashY+H*.04,W*.2,H*.1,8);c.fill();c.fillStyle='#7cff9c';c.font=`bold ${Math.max(14,H*.05)}px ui-monospace,monospace`;c.textAlign='center';c.fillText(money(Math.round(cfg.fare*Math.min(1,p/.95))),W*.66,dashY+H*.105);c.font=`${Math.max(9,H*.02)}px system-ui`;c.fillStyle='#9ee6b4';c.fillText('FARE METER',W*.66,dashY+H*.04+H*.02);
+ c.fillStyle='#14171a';c.beginPath();c.roundRect(W*.44,H*.06,W*.12,H*.07,10);c.fill();c.fillStyle='#7c8a93';c.fillRect(W*.45,H*.07,W*.1,H*.05);
+ c.strokeStyle='#d9531e';c.lineWidth=2;c.beginPath();c.moveTo(W*.5,H*.05);c.lineTo(W*.5+Math.sin(trip.t*3)*4,H*.11);c.stroke();c.fillStyle='#3f9b57';c.beginPath();c.arc(W*.5+Math.sin(trip.t*3)*4,H*.12,7,0,7);c.fill();
+ if(sk.dark>.5){const g=c.createRadialGradient(W/2,hy+H*.15,10,W/2,hy+H*.15,H*.9);g.addColorStop(0,'rgba(255,240,180,.28)');g.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=g;c.fillRect(0,0,W,H)}
+}
+function cabOutside(c,W,H,p,egoDist,sp,st,sk,cfg){
+ const gy=H*.62;sideScenery(c,W,H,gy,egoDist*W*9,st,sk);c.fillStyle='#5d666a';c.fillRect(0,gy+10,W,H*.22);c.fillStyle='#efe8c8';for(let i=-1;i<14;i++){const x=((i*140-egoDist*W*9)%(W+140)+(W+140))%(W+140)-70;c.fillRect(x,gy+10+H*.11,70,5)}c.fillStyle='#cbd4b2';c.fillRect(0,gy+4,W,8);
+ 
+ const endX=W*.5+W*9*(dist(trip.cum,1)-egoDist)+W*.55;stationBoardSimple(c,endX,gy,cfg.to);
+ cabSprite(c,W*.42,gy+H*.19+Math.sin(trip.t*16)*sp*1.4,Math.min(W/760,H/420)*1.15,state.region);
+}
+function stationBoardSimple(c,x,gy,name){c.save();c.font='bold 16px system-ui';const tw=c.measureText(name.toUpperCase()).width+36;c.fillStyle='#14372e';c.fillRect(x-tw/2,gy-200,tw,34);c.fillStyle='#c0e573';c.fillRect(x-tw/2,gy-202,tw,3);c.fillStyle='#f6f1da';c.textAlign='center';c.fillText(name.toUpperCase(),x,gy-177);c.fillStyle='#6c7c80';c.fillRect(x-4,gy-166,8,160);c.restore()}
+function trainOutside(c,W,H,p,S,sp,st,sk,cfg){
+ const gy=H*.6,scroll=S*W*6;sideScenery(c,W,H,gy,scroll,st,sk);
+ c.fillStyle='#6f7071';c.fillRect(0,gy+H*.1,W,H*.05);c.fillStyle='#8a6a4a';for(let i=-1;i<W/26+2;i++){const x=((i*26-scroll*1.0)%(W+26)+(W+26))%(W+26)-13;c.fillRect(x,gy+H*.1+H*.045,16,H*.025)}c.fillStyle='#b9bdbf';c.fillRect(0,gy+H*.1,W,3);c.fillRect(0,gy+H*.1+H*.04,W,3);
+ const sc=Math.min(W/1100,H/520)*1.0;
+ stationBoard(c,W*.5-scroll,gy+H*.1,cfg.fromStation,Math.min(1,W/900));stationBoard(c,W*.5+W*6*dist(trip.cum,1)-scroll+W*.0,gy+H*.1,cfg.toStation,Math.min(1,W/900));
+ const bob=Math.sin(trip.t*22)*sp*1.3;trainSprite(c,W*.5,gy+H*.1+4+bob,sc,trip.t,sp>.02);
+ if(sp>.05){for(let i=0;i<7;i++){const age=((trip.t*1.4+i/7)%1);c.fillStyle=`rgba(230,230,225,${.5*(1-age)})`;c.beginPath();c.arc(W*.5-sc*410+(-age*220*sp)-age*60,gy-H*.18-age*120,12+age*30,0,7);c.fill()}}
+}
+function trainInside(c,W,H,p,S,sp,st,sk,cfg){
+ const wx=W*.2,wy=H*.12,ww=W*.6,wh=H*.5;c.fillStyle='#d9d3c1';c.fillRect(0,0,W,H);c.fillStyle='#c4bda8';c.fillRect(0,H*.7,W,H*.3);
+ c.save();c.beginPath();c.roundRect(wx,wy,ww,wh,18);c.clip();const gy=wy+wh*.66,scroll=S*W*6;sideScenery(c,ww+wx,wh+wy,gy,scroll,st,sk);c.fillStyle='#6f7071';c.fillRect(wx,gy+wh*.12,ww,wh*.05);c.fillStyle='#8a6a4a';for(let i=-1;i<ww/24+2;i++){const x=((i*24-scroll)%(ww+24)+(ww+24))%(ww+24)+wx;c.fillRect(x,gy+wh*.17,14,10)}
+ // arrival station in view
+ const sx=W*.5+W*6*dist(trip.cum,1)-scroll;if(sx>wx-300&&sx<wx+ww+300)stationBoard(c,sx,gy+wh*.12,cfg.toStation,.7);const dx=W*.5-scroll;if(dx>wx-300&&dx<wx+ww+300)stationBoard(c,dx,gy+wh*.12,cfg.fromStation,.7);
+ c.restore();c.strokeStyle='#4b4234';c.lineWidth=14;c.beginPath();c.roundRect(wx,wy,ww,wh,18);c.stroke();c.strokeStyle='#bba98a';c.lineWidth=4;c.beginPath();c.roundRect(wx+8,wy+8,ww-16,wh-16,12);c.stroke();
+ c.fillStyle='#1f6f4a';c.fillRect(0,wy+wh+16,W,10);c.fillStyle='#cfc8b3';c.fillRect(0,wy-30,W,18);
+ for(let k=0;k<5;k++){const hx=W*(.12+k*.19)+Math.sin(trip.t*3+k)*3;c.strokeStyle='#8a8f90';c.lineWidth=3;c.beginPath();c.moveTo(hx,wy-12);c.lineTo(hx,wy+24);c.stroke();c.strokeStyle='#2f2f2f';c.beginPath();c.arc(hx,wy+34,10,0,7);c.stroke()}
+ // seats and passengers
+ for(const [sx2,col] of [[W*.12,'#2f6d54'],[W*.58,'#2f6d54']]){c.fillStyle=col;c.beginPath();c.roundRect(sx2,H*.58,W*.3,H*.5,18);c.fill();c.fillStyle='rgba(0,0,0,.18)';c.fillRect(sx2+10,H*.62,W*.3-20,6)}
+ const heads=[[W*.22,'#593621'],[W*.31,'#885537'],[W*.74,'#b67b50']];for(const [hx,sk2] of heads){const hy2=H*.55+Math.sin(trip.t*4+hx)*1.5;c.fillStyle=sk2;c.beginPath();c.arc(hx,hy2,W*.022,0,7);c.fill();c.fillStyle='#252d38';c.beginPath();c.ellipse(hx,hy2-W*.008,W*.024,W*.016,0,Math.PI,0);c.fill()}
+ c.fillStyle='rgba(0,0,0,.14)';c.fillRect(0,0,W,6);
+}
+/* main draw */
+function drawTrip(dt){
+ const cfg=trip.cfg,kind=trip.kind,p=trip.t/cfg.seconds,sp=profile(kind,p),surface=T('trip-canvas'),b=surface.getBoundingClientRect(),ratio=Math.min(devicePixelRatio||1,2),c=surface.getContext('2d');
+ if(surface.width!==Math.round(b.width*ratio)||surface.height!==Math.round(b.height*ratio)){surface.width=Math.round(b.width*ratio);surface.height=Math.round(b.height*ratio)}
+ c.setTransform(ratio,0,0,ratio,0,0);const W=b.width,H=b.height,st=tripStyle(),sk=skyState3D(),S=dist(trip.cum,p),pr=Math.min(1,p);
+ if(kind==='cab'){if(trip.view==='inside')cabInside(c,W,H,p,sp,S*3,st,sk,cfg);else cabOutside(c,W,H,p,S*.6,sp,st,sk,cfg)}
+ else{if(trip.view==='outside')trainOutside(c,W,H,p,S,sp,st,sk,cfg);else trainInside(c,W,H,p,S,sp,st,sk,cfg)}
+ // captions
+ const phases=kind==='cab'?['Meter on','On the road','Almost there','Arrived']:['At the platform','Pulling out','Cruising through the countryside','Slowing for the station','Arrived'];
+ const idx=kind==='cab'?(p<.07?0:p<.8?1:p<.94?2:3):(p<.1?0:p<.25?1:p<.78?2:p<.94?3:4);
+ T('trip-step').textContent='YOUR JOURNEY / '+String(idx+1).padStart(2,'0')+' OF '+String(phases.length).padStart(2,'0');T('trip-phase').textContent=phases[idx];
+ T('trip-detail').textContent=idx===phases.length-1?(kind==='cab'?'ARRIVED · '+cfg.to.toUpperCase():'WELCOME TO '+cfg.toStation.toUpperCase()):idx===0?cfg.detail:cfg.from.toUpperCase()+' → '+cfg.to.toUpperCase();
+ T('trip-a').textContent=kind==='cab'?'METER '+money(Math.round(cfg.fare*Math.min(1,p/.95))):'SEAT 14B · WINDOW';T('trip-b').textContent='SPEED '+Math.round(sp*(kind==='train'?96:48))+' KM/H';T('trip-c').textContent=cfg.kicker;T('trip-progress').value=pr;
+ trip.arrived=p>=1;T('trip-arrive').hidden=!trip.arrived;T('trip-skip').hidden=trip.arrived;
+ if(trip.arrived&&kind==='cab'&&!trip.auto){trip.auto=setTimeout(()=>{if(trip&&trip.arrived)T('trip-arrive').click()},1800)}
+ // audio
+ const s=trip.sound;if(s){const quiet=soundPrefs.muted||trip.paused||document.hidden||!audioFocused,v=quiet?0:Math.min(1,soundPrefs.volume*1.4);s.out.gain.setTargetAtTime(v,s.ctx.currentTime,.12);s.g.gain.setTargetAtTime(.2+sp*(kind==='train'?.6:.35),s.ctx.currentTime,.2);s.og.gain.setTargetAtTime(.01+sp*.045,s.ctx.currentTime,.3);s.osc.frequency.setTargetAtTime((kind==='train'?50:62)+sp*(kind==='train'?18:60),s.ctx.currentTime,.3);
+  if(!quiet&&kind==='train'&&sp>.03){trip.clackAcc+=dt*sp*5.2;if(trip.clackAcc>=1){trip.clackAcc-=1;s.clack()}}
+  if(!trip.horned.a&&((kind==='train'&&p>.115)||(kind==='cab'&&p>.3&&hash(Math.floor(cfg.seconds*10))<.7))){trip.horned.a=1;if(!quiet)s.horn()}if(!trip.horned.b&&kind==='train'&&p>.88){trip.horned.b=1;if(!quiet)s.horn()}if(!trip.horned.c&&p>=1){trip.horned.c=1;if(!quiet){s.tone(659,s.ctx.currentTime,.5,.1);s.tone(523,s.ctx.currentTime+.4,.6,.1)}}}
+}
+/* integration: cab rides */
+rideTrip=function(vehicle,dest){
+ const from=state.room?(findRoomBuilding()?.name||'here'):'Your location';
+ const seconds=Math.max(6,Math.min(11,4+(Number.isFinite(dest.dist)?dest.dist:400)/260));
+ startTrip({kind:'cab',kicker:vehicle.toUpperCase(),title:vehicle+' to '+dest.name,from,to:dest.name,seconds,fare:dest.fare,detail:'METER ON · '+region().name.toUpperCase(),note:'Stylised cab ride. The fare is charged when you arrive.',arriveLabel:'Get out',
+  onArrive:()=>{if(!pay(dest.fare,vehicle+' fare')){toast('Not enough money for the fare.');return}advance(dest.minutes);state.room=null;state.driving=false;state.x=dest.x;state.y=dest.y;state.facing='down';route=[];target=null;camera={x:dest.x,y:dest.y};if(typeof view3D!=='undefined'){view3D.scene=null;view3D.focus={x:dest.x,z:dest.y}}portalCooldown=.8;findNearby();findHubNearby();refresh();save();if(dest.enter){enterRoom(dest.enter);toast('Dropped off at '+dest.name+' · '+money(dest.fare)+' · you are inside')}else toast('Dropped off at '+dest.name+' · '+money(dest.fare))}});
+};
+/* integration: trains */
+function trainOption(id){
+ const a=TRAIN_LINE.indexOf(state.region),b=TRAIN_LINE.indexOf(id);if(a<0||b<0||a===b)return [];const d=Math.abs(a-b),fare=300+900*d,minutes=60+240*d;
+ return [{label:'Train · '+money(fare),detail:'Eastern line · '+(minutes/60)+' game hours · watch the journey',disabled:availableFunds()<fare,run:()=>startTrip({kind:'train',kicker:'NAIJA RAIL · EASTERN LINE',title:regions[state.region].name+' → '+regions[id].name,from:regions[state.region].name,to:regions[id].name,fromStation:STATIONS[state.region],toStation:STATIONS[id],seconds:22+d*4,fare,detail:'BOARDING · '+STATIONS[state.region].toUpperCase(),note:'Stylised cinematic · fictional operator. Fare charged when you get off.',arriveLabel:'Get off',onArrive:()=>instantTravel(id,'coach',fare,minutes)})}];
+}
+function trainDistrictOption(here){
+ if(!['mainland','island'].includes(here))return [];const to=here==='mainland'?'island':'mainland',fare=500;
+ return [{label:'Blue Line train · '+money(fare),detail:(here==='mainland'?'Mile 2 → Marina':'Marina → Mile 2')+' · 30 min · watch the journey',disabled:availableFunds()<fare,run:()=>startTrip({kind:'train',kicker:'LAGOS BLUE LINE · LIGHT RAIL',title:here==='mainland'?'Mile 2 → Marina':'Marina → Mile 2',from:here==='mainland'?'Lagos Mainland':'Lagos Island',to:to==='island'?'Lagos Island':'Lagos Mainland',fromStation:STATIONS['lagos-'+here],toStation:STATIONS['lagos-'+to],seconds:18,fare,detail:'BOARDING · '+STATIONS['lagos-'+here].toUpperCase(),note:'Stylised cinematic. Fare charged when you get off.',arriveLabel:'Get off',onArrive:()=>{if(!pay(fare,'Blue Line fare'))return;advance(30);setDistrict(to);toast('Welcome to '+(to==='island'?'Lagos Island':'Lagos Mainland')+'.')}})}];
+}
+
+</script>
+<!--/ch:trip.js-->
+<!--ch:stats.css-->
+<style>
+.live-chips{display:flex;gap:8px;align-items:center;margin-left:4px;pointer-events:auto}
+.live-chip{display:flex;align-items:center;gap:7px;background:var(--glass,#fbf9efd9);border:1px solid #ffffffa6;border-radius:14px;padding:9px 12px;box-shadow:var(--shadow);font-size:12px;font-weight:700;white-space:nowrap;backdrop-filter:blur(14px)}
+.live-chip small{display:block;font-size:9px;letter-spacing:1px;color:var(--muted);font-weight:700}.live-chip b{font-size:15px;font-variant-numeric:tabular-nums;letter-spacing:-.2px}
+.live-dot{width:9px;height:9px;border-radius:50%;background:#3fbf6a;box-shadow:0 0 0 0 #3fbf6a88;animation:livepulse 2s infinite}
+@keyframes livepulse{70%{box-shadow:0 0 0 8px #3fbf6a00}100%{box-shadow:0 0 0 0 #3fbf6a00}}
+.live-chips[hidden]{display:none}
+@media(max-width:1100px){.live-chip small{display:none}}
+@media(max-width:700px){.live-chips{margin-left:0;gap:4px}.live-chip{padding:6px 8px;font-size:10px;gap:5px}.live-chip b{font-size:12px}.live-chip.views{display:none}}
+@media(max-width:700px){
+ .topbar{gap:5px}.brand{padding:7px 9px!important}.brand strong::before{font-size:17px!important}
+ .clock{padding:5px 8px!important;min-width:0}.clock #day{display:none}.clock b{margin-top:0;font-size:13px!important}
+ .wallet{gap:8px!important;padding:6px 9px!important}.wallet small{font-size:7px!important;letter-spacing:.5px}.wallet b{font-size:12px!important}.wallet>div+div{padding-left:8px!important}
+ .icon-btn{min-width:38px!important;width:38px;height:38px!important;border-radius:12px}
+ .live-chip{padding:5px 7px!important}.live-chip .live-dot{width:7px;height:7px}
+}
+
+</style>
+<!--/ch:stats.css-->
+<!--ch:stats.js-->
+<script>
+/* Top-bar counters: people playing now and total website visitors (anonymous, via the Naija Life stats service) */
+(()=>{
+ const API='https://naijalife-stats.kebeeyong.workers.dev';
+ let id=null;try{id=localStorage.getItem('naija-life-vid');if(!id){id=(crypto.randomUUID?crypto.randomUUID():String(Math.random()).slice(2)+String(Date.now()));localStorage.setItem('naija-life-vid',id)}}catch{id=(crypto.randomUUID?crypto.randomUUID():String(Math.random()).slice(2)+String(Date.now()))}
+ const box=document.createElement('div');box.className='live-chips';box.hidden=true;box.setAttribute('aria-label','Live player and visitor counts');
+ box.innerHTML='<div class="live-chip playing" title="People playing right now"><span class="live-dot"></span><span><small>PLAYING NOW</small><b id="stat-playing">–</b></span></div><div class="live-chip views" title="People who have visited the website"><span aria-hidden="true">👥</span><span><small>VISITORS</small><b id="stat-visitors">–</b></span></div>';
+ const clock=document.querySelector('.clock');(clock||document.querySelector('.topbar')).after(box);
+ const fmt=n=>n>=1e6?(n/1e6).toFixed(1).replace(/\.0$/,'')+'M':n>=1e4?(n/1e3).toFixed(1).replace(/\.0$/,'')+'k':String(n);
+ const paint=data=>{if(!data||!Number.isFinite(data.visitors))return;box.hidden=false;document.getElementById('stat-playing').textContent=fmt(Math.max(0,data.playing|0));document.getElementById('stat-visitors').textContent=fmt(data.visitors|0)};
+ const readOnly=location.protocol==='file:'||/^(localhost|127\.|\[::1\])/.test(location.hostname)||/[?&]stats=view/.test(location.search);
+ const send=async event=>{try{if(readOnly){const r=await fetch(API+'/stats',{cache:'no-store'});if(r.ok)paint(await r.json());return}const r=await fetch(API+'/hit',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({id,event,playing:typeof started!=='undefined'&&started===true&&!document.hidden}),keepalive:true});if(r.ok)paint(await r.json())}catch{}};
+ send('visit');
+ let wasStarted=false;
+ setInterval(()=>{if(document.hidden)return;const nowStarted=typeof started!=='undefined'&&started===true;send(nowStarted&&!wasStarted?'play':'ping');wasStarted=nowStarted},30000);
+ // register as playing as soon as the game begins, without waiting for the next heartbeat
+ const watch=setInterval(()=>{if(typeof started!=='undefined'&&started===true){clearInterval(watch);wasStarted=true;send('play')}},1500);
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden)send('ping')});
+})();
+
+</script>
+<!--/ch:stats.js-->
 </body>
 </html>
