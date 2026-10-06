@@ -1600,22 +1600,25 @@ buildRegion3D=function(buffer){previousBuildRegionPlaces(buffer);refreshPlaces()
 <script>
 /* NEPA power lines, transformers and cell towers; plus security guards inside buildings */
 const UTIL={
- lagos:{spacing:150,wires:5,towers:[[430,92],[1250,92],[1880,1180]]},
- village:{spacing:300,wires:3,towers:[[1100,92]]},
- calabar:{spacing:190,wires:4,towers:[[1000,92],[1500,92]]},
- portharcourt:{spacing:170,wires:5,towers:[[500,92],[1450,92],[260,1180]]},
- sokoto:{spacing:260,wires:3,towers:[[1050,92]]},
- enugu:{spacing:210,wires:4,towers:[[560,92],[1500,92]]},
- benue:{spacing:260,wires:3,towers:[[1050,92]]}
+ lagos:{spacing:210,wires:4,towers:[[430,92],[1250,92],[1880,1180]]},
+ village:{spacing:380,wires:3,towers:[[1100,92]]},
+ calabar:{spacing:260,wires:4,towers:[[1000,92],[1500,92]]},
+ portharcourt:{spacing:230,wires:4,towers:[[500,92],[1450,92],[260,1180]]},
+ sokoto:{spacing:340,wires:3,towers:[[1050,92]]},
+ enugu:{spacing:270,wires:4,towers:[[560,92],[1500,92]]},
+ benue:{spacing:340,wires:3,towers:[[1050,92]]}
 };
-function pole3D(buffer,x,z,withTransformer){
- const box=(px,py,pz,W,H,D,c)=>meshBox(buffer,px,py,pz,W,H,D,c);
- box(x,46,z,5,92,5,'#7a5b3d');box(x,86,z,40,3,3,'#5a4636');box(x,76,z,30,2,2,'#5a4636');for(const o of [-17,-6,6,17])box(x+o,90,z,3,5,3,'#e8e8e0');
- if(withTransformer){box(x+9,68,z,13,17,13,'#8b979b');box(x+9,78,z,9,3,9,'#5c6663')}
+const WIRE_Z=[-9,-3,3,9],WIRE_Y=96;
+function pole3D(buffer,x,z,withTransformer,tall){
+ const box=(px,py,pz,W,H,D,c)=>meshBox(buffer,px,py,pz,W,H,D,c),top=tall?104:98;
+ box(x,top/2,z,6.5,top,6.5,'#8e8a7e');box(x,top/2,z,4,top,4,'#a39f92');
+ box(x,top-4,z,4,3,26,'#5a4636');box(x,top-14,z,3,3,18,'#5a4636');box(x+3,top-9,z,2,12,2,'#5a4636');
+ for(const o of WIRE_Z){box(x,top-1,z+o,2.4,5,2.4,'#dfe4e6');box(x,top+2,z+o,3.4,2,3.4,'#b9c0c3')}
+ if(withTransformer){box(x+10,top-26,z,12,18,12,'#7d8b91');box(x+10,top-15,z,14,3,14,'#566067');box(x+10,top-38,z,14,3,14,'#566067');box(x+4,top-26,z,3,3,2,'#2b2b2b')}
 }
-function wires3D(buffer,x1,x2,z,count){
- const len=x2-x1,mid=(x1+x2)/2,drops=[0,-3.5,0];
- for(let line=0;line<count;line++){const offsetZ=(line-(count-1)/2)*2.2,y=86-(line%2)*10;const segs=6;for(let i=0;i<segs;i++){const t0=i/segs,t1=(i+1)/segs,sag0=Math.sin(t0*Math.PI)*-6,sag1=Math.sin(t1*Math.PI)*-6,xa=x1+len*t0,xb=x1+len*t1;meshBox(buffer,(xa+xb)/2,y+(sag0+sag1)/2,z+offsetZ*.25,Math.abs(xb-xa)+1,1.1,1.1,'#2b2b2b')}}
+function wires3D(buffer,x1,x2,z,count,top){
+ const len=x2-x1,segs=8,y0=top-1;
+ for(let line=0;line<Math.min(count,WIRE_Z.length);line++){const oz=WIRE_Z[line];for(let i=0;i<segs;i++){const t0=i/segs,t1=(i+1)/segs,s0=Math.sin(t0*Math.PI)*-7,s1=Math.sin(t1*Math.PI)*-7,xa=x1+len*t0,xb=x1+len*t1;meshBox(buffer,(xa+xb)/2,y0+(s0+s1)/2,z+oz,Math.abs(xb-xa)+.6,.7,.7,'#4a4f52')}}
 }
 function tower3D(buffer,x,z){
  const box=(px,py,pz,W,H,D,c)=>meshBox(buffer,px,py,pz,W,H,D,c),levels=7,seg=26;
@@ -1625,7 +1628,7 @@ function tower3D(buffer,x,z){
 const previousBuildRegionUtil=buildRegion3D;
 buildRegion3D=function(buffer){
  previousBuildRegionUtil(buffer);const cfg=UTIL[state.region]||UTIL.lagos;
- for(const z of [470,1103]){let prev=null,index=0;for(let x=60;x<=1960;x+=cfg.spacing){if(x>840&&x<1030){prev=null;continue}pole3D(buffer,x,z,index%3===1);if(prev!==null)wires3D(buffer,prev,x,z,cfg.wires);prev=x;index++}}
+ for(const z of [462,1106]){let prev=null,index=0;for(let x=70;x<=1960;x+=cfg.spacing){const crossing=(x>835&&x<1035)||(x>425&&x<515)||(x>1355&&x<1445);if(crossing)continue;const tall=index%4===0;pole3D(buffer,x,z,index%3===1,tall);if(prev!==null)wires3D(buffer,prev.x,x,z,cfg.wires,prev.top<x?98:98);prev={x,top:98};index++}}
  for(const [x,z] of cfg.towers)tower3D(buffer,x,z);
 };
 /* Security guards at the door of every building interior (except home) */
