@@ -1,366 +1,706 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Appvalent — Meaningful Mobile Apps</title>
-  <meta name="description" content="Appvalent Limited builds thoughtful, beautiful mobile apps for iOS and Android." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Appvalent — Indie App Studio</title>
+<meta name="description" content="Appvalent is an indie app studio crafting thoughtful, beautifully made mobile apps for iOS and Android.">
+<meta name="theme-color" content="#07060F">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #07060F;
+    --ink-2: #0E0C1C;
+    --ink-3: #161328;
+    --line-dark: rgba(255,255,255,.08);
+    --line-dark-2: rgba(255,255,255,.14);
+    --text-on-dark: #F4F2FA;
+    --mute-on-dark: #A19CB8;
 
-    :root {
-      --ink:      #0D0D1A;
-      --ink-soft: #4A4A60;
-      --ink-mute: #9898A8;
-      --bg:       #FAFAF8;
-      --bg-alt:   #F3F2EF;
-      --accent:   #4F3F8F;
-      --accent-2: #C4618A;
-      --gold:     #C9A84C;
-      --white:    #FFFFFF;
-      --radius:   16px;
-    }
+    --bg: #FBFAF8;
+    --bg-2: #F3F1EE;
+    --surface: #FFFFFF;
+    --line: #E7E4EE;
+    --text: #0D0B1A;
+    --text-2: #4A4760;
+    --text-3: #807C95;
 
-    html { scroll-behavior: smooth; }
+    --violet: #6B57D6;
+    --violet-deep: #4F3F8F;
+    --rose: #D0679A;
+    --gold: #C9A84C;
+    --grad: linear-gradient(120deg, #8B7BFF 0%, #D0679A 55%, #F0B07A 100%);
 
-    body {
-      font-family: 'Inter', sans-serif;
-      background: var(--bg);
-      color: var(--ink);
-      -webkit-font-smoothing: antialiased;
-    }
+    --radius-sm: 10px;
+    --radius: 18px;
+    --radius-lg: 28px;
+    --shadow-sm: 0 1px 2px rgba(13,11,26,.06), 0 1px 1px rgba(13,11,26,.04);
+    --shadow: 0 1px 2px rgba(13,11,26,.05), 0 8px 24px -8px rgba(13,11,26,.12);
+    --shadow-lg: 0 30px 80px -20px rgba(13,11,26,.35);
 
-    /* ── Nav ─────────────────────────────────────────── */
-    nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0 40px; height: 64px;
-      background: rgba(250,250,248,0.85);
-      backdrop-filter: blur(16px);
-      border-bottom: 1px solid rgba(0,0,0,0.06);
-    }
-    .nav-logo {
-      font-family: 'Playfair Display', serif;
-      font-size: 20px; font-weight: 700;
-      color: var(--ink); text-decoration: none;
-      letter-spacing: -0.3px;
-    }
-    .nav-logo span { color: var(--accent); }
-    .nav-links { display: flex; gap: 32px; list-style: none; }
-    .nav-links a {
-      font-size: 13.5px; font-weight: 500;
-      color: var(--ink-soft); text-decoration: none;
-      letter-spacing: 0.2px; transition: color 0.2s;
-    }
-    .nav-links a:hover { color: var(--ink); }
+    --max: 1200px;
+    --gutter: clamp(16px, 4vw, 40px);
+    --ease: cubic-bezier(.2,.7,.2,1);
+  }
 
-    /* ── Hero ────────────────────────────────────────── */
-    .hero {
-      min-height: 100vh;
-      display: flex; align-items: center; justify-content: center;
-      text-align: center;
-      padding: 120px 24px 80px;
-      background:
-        radial-gradient(ellipse 70% 50% at 20% 40%, rgba(79,63,143,0.08) 0%, transparent 60%),
-        radial-gradient(ellipse 50% 40% at 80% 60%, rgba(196,97,138,0.07) 0%, transparent 60%),
-        var(--bg);
-    }
-    .hero-eyebrow {
-      display: inline-block;
-      font-size: 11px; font-weight: 600;
-      letter-spacing: 3px; text-transform: uppercase;
-      color: var(--accent);
-      background: rgba(79,63,143,0.08);
-      padding: 6px 16px; border-radius: 100px;
-      margin-bottom: 28px;
-    }
-    .hero h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(46px, 7vw, 82px);
-      font-weight: 700; line-height: 1.08;
-      letter-spacing: -1.5px;
-      color: var(--ink);
-      max-width: 760px; margin: 0 auto 28px;
-    }
-    .hero h1 em { font-style: italic; color: var(--accent); }
-    .hero-sub {
-      font-size: 17px; font-weight: 400; line-height: 1.7;
-      color: var(--ink-soft);
-      max-width: 480px; margin: 0 auto 48px;
-    }
-    .hero-cta {
-      display: inline-flex; align-items: center; gap: 8px;
-      background: var(--ink); color: var(--white);
-      padding: 14px 30px; border-radius: 100px;
-      font-size: 14px; font-weight: 600;
-      text-decoration: none; letter-spacing: 0.2px;
-      transition: opacity 0.2s, transform 0.2s;
-    }
-    .hero-cta:hover { opacity: 0.85; transform: translateY(-1px); }
+  *, *::before, *::after { box-sizing: border-box; }
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--text);
+    background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+  img { max-width: 100%; display: block; }
+  a { color: inherit; text-decoration: none; }
+  .wrap { max-width: var(--max); margin: 0 auto; padding: 0 var(--gutter); }
+  .serif { font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-style: italic; letter-spacing: -.01em; }
+  .grad-text { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 
-    /* ── Section shared ──────────────────────────────── */
-    section { padding: 100px 24px; }
-    .container { max-width: 1080px; margin: 0 auto; }
-    .section-label {
-      font-size: 11px; font-weight: 600;
-      letter-spacing: 3px; text-transform: uppercase;
-      color: var(--accent); margin-bottom: 16px;
-    }
-    .section-title {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(32px, 4vw, 50px);
-      font-weight: 700; line-height: 1.1;
-      letter-spacing: -0.8px; color: var(--ink);
-      margin-bottom: 16px;
-    }
-    .section-sub {
-      font-size: 16px; color: var(--ink-soft);
-      line-height: 1.7; max-width: 520px;
-    }
+  /* ---------- Buttons ---------- */
+  .btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    height: 46px; padding: 0 20px; border-radius: 999px;
+    font-size: 15px; font-weight: 500; letter-spacing: -.005em;
+    transition: transform .2s var(--ease), background .2s, box-shadow .2s, border-color .2s, color .2s;
+    white-space: nowrap; cursor: pointer; border: 1px solid transparent;
+  }
+  .btn svg { width: 16px; height: 16px; transition: transform .2s var(--ease); }
+  .btn:hover svg { transform: translateX(3px); }
+  .btn-primary { background: #fff; color: var(--ink); box-shadow: 0 0 0 1px rgba(255,255,255,.2), 0 8px 30px -6px rgba(139,123,255,.55); }
+  .btn-primary:hover { transform: translateY(-1px); }
+  .btn-ghost { color: var(--text-on-dark); border-color: var(--line-dark-2); background: rgba(255,255,255,.03); }
+  .btn-ghost:hover { border-color: rgba(255,255,255,.3); background: rgba(255,255,255,.07); }
+  .btn-dark { background: var(--ink); color: #fff; }
+  .btn-dark:hover { background: var(--ink-3); transform: translateY(-1px); }
+  .btn-outline { border-color: var(--line); color: var(--text); background: var(--surface); box-shadow: var(--shadow-sm); }
+  .btn-outline:hover { border-color: #CFCBDB; }
+  :focus-visible { outline: 2px solid var(--violet); outline-offset: 3px; border-radius: 6px; }
 
-    /* ── Apps grid ───────────────────────────────────── */
-    .apps-section { background: var(--bg); }
-    .apps-header { margin-bottom: 56px; }
-    .apps-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 24px;
-    }
-    .app-card {
-      background: var(--white);
-      border: 1px solid rgba(0,0,0,0.07);
-      border-radius: 24px;
-      padding: 36px;
-      text-decoration: none;
-      color: inherit;
-      transition: box-shadow 0.25s, transform 0.25s;
-      display: flex; flex-direction: column; gap: 20px;
-    }
-    .app-card:hover {
-      box-shadow: 0 20px 60px rgba(0,0,0,0.09);
-      transform: translateY(-3px);
-    }
-    .app-icon {
-      width: 68px; height: 68px; border-radius: 18px;
-      overflow: hidden; flex-shrink: 0;
-    }
-    .app-icon img { width: 100%; height: 100%; display: block; }
-    .app-card-name {
-      font-family: 'Playfair Display', serif;
-      font-size: 22px; font-weight: 700;
-      letter-spacing: -0.3px; color: var(--ink);
-    }
-    .app-card-tagline {
-      font-size: 14px; color: var(--ink-soft);
-      line-height: 1.6;
-    }
-    .app-card-platforms {
-      display: flex; gap: 8px; margin-top: auto;
-    }
-    .platform-badge {
-      font-size: 11px; font-weight: 600;
-      letter-spacing: 0.5px;
-      padding: 5px 12px; border-radius: 100px;
-      background: var(--bg-alt); color: var(--ink-soft);
-    }
-    .app-card-arrow {
-      margin-left: auto; font-size: 18px;
-      color: var(--ink-mute); transition: transform 0.2s;
-    }
-    .app-card:hover .app-card-arrow { transform: translateX(4px); }
+  /* ---------- Nav ---------- */
+  .nav {
+    position: fixed; inset: 0 0 auto 0; z-index: 50;
+    transition: background .3s, border-color .3s, backdrop-filter .3s;
+    border-bottom: 1px solid transparent;
+  }
+  .nav.scrolled { background: rgba(7,6,15,.72); backdrop-filter: saturate(160%) blur(16px); -webkit-backdrop-filter: saturate(160%) blur(16px); border-bottom-color: var(--line-dark); }
+  .nav-inner { height: 72px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+  .logo { display: inline-flex; align-items: center; gap: 10px; color: #fff; font-weight: 600; font-size: 18px; letter-spacing: -.02em; }
+  .logo-mark { width: 30px; height: 30px; border-radius: 9px; background: var(--grad); display: grid; place-items: center; box-shadow: inset 0 0 0 1px rgba(255,255,255,.25); }
+  .logo-mark svg { width: 16px; height: 16px; }
+  .nav-links { display: flex; align-items: center; gap: 4px; }
+  .nav-links a { color: var(--mute-on-dark); font-size: 14.5px; font-weight: 500; padding: 8px 14px; border-radius: 999px; transition: color .2s, background .2s; }
+  .nav-links a:hover { color: #fff; background: rgba(255,255,255,.06); }
+  .nav-cta { display: flex; align-items: center; gap: 10px; }
+  .nav .btn { height: 38px; padding: 0 16px; font-size: 14px; }
+  .menu-btn { display: none; width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--line-dark-2); background: transparent; color: #fff; cursor: pointer; place-items: center; }
+  .menu-btn svg { width: 20px; height: 20px; }
+  .mobile-menu { display: none; }
 
-    .app-card-soon {
-      background: var(--bg-alt);
-      border: 2px dashed rgba(0,0,0,0.1);
-      cursor: default;
-    }
-    .app-card-soon:hover {
-      box-shadow: none; transform: none;
-    }
-    .soon-badge {
-      display: inline-block;
-      font-size: 11px; font-weight: 600;
-      letter-spacing: 2px; text-transform: uppercase;
-      color: var(--ink-mute);
-      background: rgba(0,0,0,0.05);
-      padding: 5px 12px; border-radius: 100px;
-    }
+  /* ---------- Hero ---------- */
+  .hero { position: relative; background: var(--ink); color: var(--text-on-dark); padding: 148px 0 0; overflow: hidden; isolation: isolate; }
+  .hero::before {
+    content: ""; position: absolute; inset: 0; z-index: -2;
+    background:
+      radial-gradient(60% 50% at 75% 30%, rgba(107,87,214,.38), transparent 70%),
+      radial-gradient(40% 40% at 20% 10%, rgba(208,103,154,.22), transparent 70%),
+      radial-gradient(50% 40% at 50% 100%, rgba(107,87,214,.25), transparent 70%);
+  }
+  .hero::after {
+    content: ""; position: absolute; inset: 0; z-index: -1; opacity: .5;
+    background-image: linear-gradient(var(--line-dark) 1px, transparent 1px), linear-gradient(90deg, var(--line-dark) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, #000 30%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, #000 30%, transparent 75%);
+  }
+  .hero-grid { display: grid; grid-template-columns: 1.05fr .95fr; gap: 48px; align-items: center; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 6px 14px 6px 6px; border-radius: 999px;
+    border: 1px solid var(--line-dark-2); background: rgba(255,255,255,.04);
+    font-size: 13px; color: var(--mute-on-dark); font-weight: 500;
+  }
+  .eyebrow b { background: rgba(139,123,255,.18); color: #C9C0FF; font-weight: 600; padding: 3px 10px; border-radius: 999px; font-size: 12px; }
+  .hero h1 {
+    font-size: clamp(44px, 6.4vw, 84px); line-height: 1.0; letter-spacing: -.045em; font-weight: 600;
+    margin: 28px 0 24px; color: #fff;
+  }
+  .hero h1 .serif { font-size: 1.08em; letter-spacing: -.02em; }
+  .hero-lead { font-size: clamp(17px, 1.6vw, 20px); color: var(--mute-on-dark); max-width: 520px; margin: 0 0 36px; line-height: 1.55; }
+  .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+  .hero-meta { display: flex; flex-wrap: wrap; gap: 28px; margin-top: 48px; padding-top: 28px; border-top: 1px solid var(--line-dark); max-width: 520px; }
+  .hero-meta div { font-size: 13px; color: var(--mute-on-dark); display: flex; align-items: center; gap: 8px; }
+  .hero-meta svg { width: 16px; height: 16px; color: #C9C0FF; flex: none; }
 
-    /* ── About ───────────────────────────────────────── */
-    .about-section {
-      background: var(--ink);
-      color: var(--white);
-    }
-    .about-section .section-label { color: rgba(255,255,255,0.4); }
-    .about-section .section-title { color: var(--white); }
-    .about-section .section-sub { color: rgba(255,255,255,0.55); max-width: 600px; }
-    .about-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 32px; margin-top: 60px;
-    }
-    .about-item h3 {
-      font-family: 'Playfair Display', serif;
-      font-size: 18px; font-weight: 700;
-      color: var(--white); margin-bottom: 10px;
-    }
-    .about-item p {
-      font-size: 14px; line-height: 1.7;
-      color: rgba(255,255,255,0.5);
-    }
+  /* Device showcase */
+  .showcase { position: relative; height: 600px; }
+  .phone {
+    position: absolute; width: 270px; height: 560px; border-radius: 44px; padding: 10px;
+    background: linear-gradient(160deg, #2A2640, #0B0A14);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.12), 0 50px 100px -30px rgba(0,0,0,.8), 0 0 0 1px rgba(0,0,0,.6);
+  }
+  .phone-screen { position: relative; width: 100%; height: 100%; border-radius: 35px; overflow: hidden; }
+  .phone-notch { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 88px; height: 26px; border-radius: 20px; background: #000; z-index: 3; }
+  .phone-a { left: 4%; top: 30px; transform: rotate(-6deg); z-index: 2; animation: floatA 9s ease-in-out infinite; }
+  .phone-b { right: 2%; top: 0; transform: rotate(5deg); z-index: 1; animation: floatB 10s ease-in-out infinite; }
+  @keyframes floatA { 0%,100% { transform: rotate(-6deg) translateY(0); } 50% { transform: rotate(-6deg) translateY(-14px); } }
+  @keyframes floatB { 0%,100% { transform: rotate(5deg) translateY(0); } 50% { transform: rotate(5deg) translateY(12px); } }
 
-    /* ── Footer ──────────────────────────────────────── */
-    footer {
-      background: var(--ink);
-      border-top: 1px solid rgba(255,255,255,0.06);
-      padding: 40px 24px;
-    }
-    .footer-inner {
-      max-width: 1080px; margin: 0 auto;
-      display: flex; align-items: center; justify-content: space-between;
-      flex-wrap: wrap; gap: 16px;
-    }
-    .footer-logo {
-      font-family: 'Playfair Display', serif;
-      font-size: 16px; font-weight: 700;
-      color: rgba(255,255,255,0.5); text-decoration: none;
-    }
-    .footer-logo span { color: rgba(255,255,255,0.25); }
-    .footer-links {
-      display: flex; gap: 24px; list-style: none;
-    }
-    .footer-links a {
-      font-size: 13px; color: rgba(255,255,255,0.35);
-      text-decoration: none; transition: color 0.2s;
-    }
-    .footer-links a:hover { color: rgba(255,255,255,0.7); }
-    .footer-copy {
-      font-size: 12px; color: rgba(255,255,255,0.2);
-      width: 100%; margin-top: 8px;
-    }
+  /* Blumly screen */
+  .scr-blumly { background: radial-gradient(120% 70% at 50% 30%, #3A1A48 0%, #150B22 60%, #0B0613 100%); color: #fff; padding: 52px 22px 22px; display: flex; flex-direction: column; }
+  .scr-top { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: rgba(255,255,255,.6); }
+  .scr-top img { width: 26px; height: 26px; border-radius: 7px; }
+  .pill-live { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; background: rgba(240,120,180,.14); color: #F7A8CF; font-weight: 600; font-size: 10.5px; }
+  .pill-live i { width: 6px; height: 6px; border-radius: 50%; background: #FF6FB1; box-shadow: 0 0 10px #FF6FB1; animation: pulse 1s ease-in-out infinite; }
+  @keyframes pulse { 50% { opacity: .35; } }
+  .bpm-ring { margin: 34px auto 10px; width: 170px; height: 170px; border-radius: 50%; display: grid; place-items: center; position: relative;
+    background: radial-gradient(circle, rgba(255,111,177,.16), transparent 65%); }
+  .bpm-ring::before, .bpm-ring::after { content: ""; position: absolute; inset: 0; border-radius: 50%; border: 1.5px solid rgba(255,111,177,.55); animation: ripple 2.4s ease-out infinite; }
+  .bpm-ring::after { animation-delay: 1.2s; }
+  @keyframes ripple { from { transform: scale(.75); opacity: 1; } to { transform: scale(1.15); opacity: 0; } }
+  .bpm-val { text-align: center; }
+  .bpm-val strong { display: block; font-size: 54px; font-weight: 600; letter-spacing: -.04em; line-height: 1; }
+  .bpm-val span { font-size: 11px; color: rgba(255,255,255,.55); letter-spacing: .14em; text-transform: uppercase; }
+  .ecg { width: 100%; height: 64px; margin: 10px 0 18px; }
+  .ecg path { fill: none; stroke: #FF6FB1; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 0 6px rgba(255,111,177,.8));
+    stroke-dasharray: 520; stroke-dashoffset: 520; animation: draw 2.6s linear infinite; }
+  @keyframes draw { to { stroke-dashoffset: -520; } }
+  .scr-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: auto; }
+  .scr-card { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.08); border-radius: 14px; padding: 10px 12px; }
+  .scr-card small { display: block; font-size: 9.5px; color: rgba(255,255,255,.5); text-transform: uppercase; letter-spacing: .1em; }
+  .scr-card b { font-size: 15px; font-weight: 600; }
 
-    /* ── Responsive ──────────────────────────────────── */
-    @media (max-width: 640px) {
-      nav { padding: 0 20px; }
-      .nav-links { display: none; }
-      .footer-inner { flex-direction: column; align-items: flex-start; }
-    }
-  </style>
+  /* Glow screen */
+  .scr-glow { background: linear-gradient(180deg, #FFF8F4 0%, #F8EEF6 100%); color: #1A1428; padding: 52px 20px 20px; display: flex; flex-direction: column; }
+  .scr-glow .scr-top { color: #8C8499; }
+  .score { margin: 26px auto 6px; width: 160px; height: 160px; position: relative; }
+  .score svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .score circle { fill: none; stroke-width: 10; }
+  .score .track { stroke: #EFE5EF; }
+  .score .bar { stroke: url(#glowGrad); stroke-linecap: round; stroke-dasharray: 440; stroke-dashoffset: 62; }
+  .score-label { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; }
+  .score-label strong { display: block; font-size: 46px; font-weight: 600; letter-spacing: -.04em; line-height: 1; }
+  .score-label span { font-size: 10px; color: #8C8499; letter-spacing: .14em; text-transform: uppercase; }
+  .glow-delta { text-align: center; font-size: 11.5px; color: #2E9E6A; font-weight: 600; margin-bottom: 18px; }
+  .bars { display: flex; align-items: flex-end; gap: 7px; height: 84px; padding: 12px; background: #fff; border-radius: 16px; box-shadow: 0 4px 16px -6px rgba(80,40,90,.18); }
+  .bars i { flex: 1; border-radius: 5px; background: linear-gradient(180deg, #C9A0F0, #F0A3C4); }
+  .metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 10px; }
+  .metrics div { background: #fff; border-radius: 12px; padding: 8px; text-align: center; box-shadow: 0 2px 8px -4px rgba(80,40,90,.15); }
+  .metrics small { display: block; font-size: 8.5px; color: #8C8499; text-transform: uppercase; letter-spacing: .08em; }
+  .metrics b { font-size: 13px; }
+
+  .float-chip {
+    position: absolute; z-index: 4; display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px 10px 10px; border-radius: 14px;
+    background: rgba(22,19,40,.75); border: 1px solid var(--line-dark-2);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    font-size: 12.5px; color: #fff; box-shadow: 0 20px 40px -12px rgba(0,0,0,.5);
+  }
+  .float-chip .ic { width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center; background: rgba(46,158,106,.18); color: #5FD39B; }
+  .float-chip .ic svg { width: 16px; height: 16px; }
+  .float-chip small { display: block; color: var(--mute-on-dark); font-size: 11px; }
+  .chip-1 { left: -4%; bottom: 70px; }
+  .chip-2 { right: -2%; bottom: 150px; }
+  .chip-2 .ic { background: rgba(139,123,255,.2); color: #C9C0FF; }
+
+  .hero-fade { height: 120px; margin-top: -40px; background: linear-gradient(180deg, transparent, var(--ink)); position: relative; }
+
+  /* Platform band */
+  .band { background: var(--ink); border-top: 1px solid var(--line-dark); color: var(--mute-on-dark); }
+  .band-inner { display: grid; grid-template-columns: repeat(4, 1fr); }
+  .band-item { padding: 28px 24px; border-right: 1px solid var(--line-dark); display: flex; flex-direction: column; gap: 4px; }
+  .band-item:first-child { padding-left: 0; }
+  .band-item:last-child { border-right: 0; }
+  .band-item strong { color: #fff; font-size: 28px; font-weight: 600; letter-spacing: -.03em; line-height: 1.1; }
+  .band-item span { font-size: 13.5px; }
+
+  /* ---------- Sections ---------- */
+  section { position: relative; }
+  .section { padding: clamp(80px, 11vw, 140px) 0; }
+  .kicker { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--violet); }
+  .kicker::before { content: ""; width: 18px; height: 1.5px; background: currentColor; }
+  .h2 { font-size: clamp(34px, 4.6vw, 58px); line-height: 1.04; letter-spacing: -.04em; font-weight: 600; margin: 18px 0 18px; }
+  .h2 .serif { font-size: 1.08em; }
+  .lead { font-size: clamp(16px, 1.4vw, 18.5px); color: var(--text-2); max-width: 580px; margin: 0; }
+  .section-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 32px; margin-bottom: 56px; flex-wrap: wrap; }
+
+  /* Apps */
+  .apps-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 20px; }
+  .app-card {
+    grid-column: span 6; position: relative; overflow: hidden;
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg);
+    padding: 36px; display: flex; flex-direction: column; min-height: 460px;
+    box-shadow: var(--shadow-sm);
+    transition: transform .35s var(--ease), box-shadow .35s var(--ease), border-color .35s;
+  }
+  .app-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); border-color: transparent; }
+  .app-card .art { position: absolute; right: -60px; bottom: -60px; width: 340px; height: 340px; border-radius: 50%; filter: blur(10px); opacity: .9; pointer-events: none; transition: transform .6s var(--ease); }
+  .app-card:hover .art { transform: scale(1.08); }
+  .app-card.blumly .art { background: radial-gradient(circle, rgba(208,103,154,.28), rgba(107,87,214,.12) 50%, transparent 70%); }
+  .app-card.glow .art { background: radial-gradient(circle, rgba(240,176,122,.3), rgba(208,103,154,.14) 50%, transparent 70%); }
+  .app-head { display: flex; align-items: center; gap: 16px; margin-bottom: 28px; }
+  .app-icon { width: 72px; height: 72px; border-radius: 18px; box-shadow: 0 10px 24px -8px rgba(13,11,26,.35), 0 0 0 1px rgba(13,11,26,.06); background: #fff; object-fit: cover; }
+  .app-icon.glow-bg { background: linear-gradient(160deg, #FFF6F1, #F7E9F5); padding: 4px; }
+  .app-cat { font-size: 13px; color: var(--text-3); font-weight: 500; }
+  .app-name { font-size: 26px; font-weight: 600; letter-spacing: -.03em; line-height: 1.15; margin: 2px 0 0; }
+  .app-desc { font-size: 17px; color: var(--text-2); max-width: 400px; margin: 0 0 24px; position: relative; }
+  .feature-list { list-style: none; padding: 0; margin: 0 0 32px; display: grid; gap: 10px; position: relative; }
+  .feature-list li { display: flex; gap: 10px; align-items: center; font-size: 14.5px; color: var(--text-2); }
+  .feature-list svg { width: 18px; height: 18px; color: var(--violet); flex: none; }
+  .app-foot { margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; position: relative; }
+  .platforms { display: flex; gap: 8px; }
+  .platform { display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 12px; border-radius: 999px; background: var(--bg-2); font-size: 13px; font-weight: 500; color: var(--text-2); }
+  .platform svg { width: 14px; height: 14px; }
+  .link-arrow { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; font-size: 15px; color: var(--text); }
+  .link-arrow svg { width: 16px; height: 16px; transition: transform .2s var(--ease); }
+  .app-card:hover .link-arrow svg { transform: translateX(4px); }
+  .stretched::after { content: ""; position: absolute; inset: 0; z-index: 1; }
+
+  .soon-card {
+    grid-column: span 12; border-radius: var(--radius-lg); padding: 32px 36px;
+    background: var(--ink); color: var(--text-on-dark); position: relative; overflow: hidden;
+    display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap;
+  }
+  .soon-card::before { content: ""; position: absolute; inset: 0; background: radial-gradient(50% 120% at 90% 50%, rgba(107,87,214,.35), transparent 70%); }
+  .soon-left { display: flex; align-items: center; gap: 20px; position: relative; }
+  .soon-icon { width: 60px; height: 60px; border-radius: 16px; border: 1px dashed rgba(255,255,255,.25); display: grid; place-items: center; color: var(--gold); font-size: 22px; }
+  .soon-card h3 { margin: 0 0 2px; font-size: 21px; font-weight: 600; letter-spacing: -.02em; }
+  .soon-card p { margin: 0; color: var(--mute-on-dark); font-size: 15px; }
+  .badge-soon { position: relative; display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; color: #E9D9A6; background: rgba(201,168,76,.12); border: 1px solid rgba(201,168,76,.3); }
+  .badge-soon i { width: 6px; height: 6px; border-radius: 50%; background: var(--gold); animation: pulse 1.6s ease-in-out infinite; }
+
+  /* Principles */
+  .principles { background: var(--bg-2); }
+  .about-grid { display: grid; grid-template-columns: .9fr 1.1fr; gap: 64px; align-items: start; }
+  .about-sticky { position: sticky; top: 120px; }
+  .about-sticky .lead + .lead { margin-top: 16px; }
+  .values { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--radius-lg); overflow: hidden; }
+  .value { background: var(--surface); padding: 36px 32px; transition: background .3s; }
+  .value:hover { background: #FDFCFF; }
+  .value-ic { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; margin-bottom: 22px; color: var(--violet-deep);
+    background: linear-gradient(160deg, #F1EEFF, #FBEFF5); box-shadow: inset 0 0 0 1px rgba(107,87,214,.12); }
+  .value-ic svg { width: 22px; height: 22px; }
+  .value h3 { margin: 0 0 8px; font-size: 18px; font-weight: 600; letter-spacing: -.02em; }
+  .value p { margin: 0; color: var(--text-2); font-size: 15px; }
+
+  /* Process */
+  .process { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; counter-reset: step; }
+  .step { position: relative; padding: 28px 24px 30px; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow-sm); }
+  .step::before { counter-increment: step; content: "0" counter(step); display: block; font-size: 13px; font-weight: 600; color: var(--text-3); letter-spacing: .06em; margin-bottom: 40px; font-variant-numeric: tabular-nums; }
+  .step h3 { margin: 0 0 8px; font-size: 18px; font-weight: 600; letter-spacing: -.02em; }
+  .step p { margin: 0; font-size: 14.5px; color: var(--text-2); }
+  .step .bar-line { position: absolute; top: 0; left: 24px; right: 24px; height: 2px; border-radius: 2px; background: var(--grad); opacity: .0; transition: opacity .3s; }
+  .step:hover .bar-line { opacity: 1; }
+
+  /* Privacy */
+  .privacy { background: var(--ink); color: var(--text-on-dark); overflow: hidden; isolation: isolate; }
+  .privacy::before { content: ""; position: absolute; inset: 0; z-index: -1; background: radial-gradient(50% 60% at 15% 50%, rgba(107,87,214,.3), transparent 70%), radial-gradient(40% 50% at 90% 20%, rgba(208,103,154,.18), transparent 70%); }
+  .privacy .kicker { color: #B9AEFF; }
+  .privacy .lead { color: var(--mute-on-dark); }
+  .privacy-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
+  .shield-panel { border: 1px solid var(--line-dark-2); border-radius: var(--radius-lg); background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.015)); padding: 8px; }
+  .shield-row { display: flex; align-items: center; gap: 16px; padding: 20px 22px; border-radius: 20px; }
+  .shield-row + .shield-row { border-top: 1px solid var(--line-dark); border-radius: 0; }
+  .shield-row .ic { width: 40px; height: 40px; border-radius: 11px; background: rgba(255,255,255,.06); display: grid; place-items: center; color: #C9C0FF; flex: none; }
+  .shield-row .ic svg { width: 20px; height: 20px; }
+  .shield-row div { flex: 1; }
+  .shield-row strong { display: block; font-size: 15.5px; font-weight: 600; }
+  .shield-row small { color: var(--mute-on-dark); font-size: 13.5px; }
+  .check { width: 24px; height: 24px; border-radius: 50%; background: rgba(46,158,106,.18); color: #5FD39B; display: grid; place-items: center; flex: none; }
+  .check svg { width: 14px; height: 14px; }
+
+  /* CTA */
+  .cta-box {
+    position: relative; overflow: hidden; border-radius: 32px; padding: clamp(48px, 7vw, 88px) clamp(24px, 6vw, 80px);
+    background: var(--surface); border: 1px solid var(--line); text-align: center; box-shadow: var(--shadow);
+  }
+  .cta-box::before { content: ""; position: absolute; inset: -40% -10% auto; height: 120%; background: radial-gradient(45% 45% at 50% 50%, rgba(139,123,255,.16), transparent 70%); pointer-events: none; }
+  .cta-box > * { position: relative; }
+  .cta-box .h2 { max-width: 760px; margin-left: auto; margin-right: auto; }
+  .cta-box .lead { margin: 0 auto 36px; }
+  .cta-actions { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+  .copy-btn.copied { color: #2E9E6A; border-color: #BFE6D2; }
+
+  /* Footer */
+  footer { background: var(--ink); color: var(--mute-on-dark); padding: 72px 0 36px; font-size: 14.5px; }
+  .foot-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; padding-bottom: 56px; border-bottom: 1px solid var(--line-dark); }
+  .foot-brand p { max-width: 320px; margin: 18px 0 0; }
+  footer h4 { color: #fff; font-size: 13px; font-weight: 600; margin: 4px 0 16px; letter-spacing: .02em; }
+  footer ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  footer a:hover { color: #fff; }
+  .foot-bottom { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding-top: 28px; font-size: 13px; }
+  .status { display: inline-flex; align-items: center; gap: 8px; }
+  .status i { width: 7px; height: 7px; border-radius: 50%; background: #5FD39B; box-shadow: 0 0 8px #5FD39B; }
+
+  /* Reveal */
+  .reveal { opacity: 0; transform: translateY(18px); transition: opacity .8s var(--ease), transform .8s var(--ease); }
+  .reveal.in { opacity: 1; transform: none; }
+  .d1 { transition-delay: .08s; } .d2 { transition-delay: .16s; } .d3 { transition-delay: .24s; }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 1024px) {
+    .hero-grid { grid-template-columns: 1fr; gap: 24px; }
+    .hero-copy { text-align: center; }
+    .hero-lead, .hero-meta { margin-left: auto; margin-right: auto; }
+    .hero-actions, .hero-meta { justify-content: center; }
+    .showcase { max-width: 560px; width: 100%; margin: 0 auto; }
+    .about-grid, .privacy-grid { grid-template-columns: 1fr; gap: 48px; }
+    .about-sticky { position: static; }
+    .process { grid-template-columns: 1fr 1fr; }
+    .foot-grid { grid-template-columns: 1fr 1fr 1fr; }
+    .foot-brand { grid-column: 1 / -1; }
+  }
+  @media (max-width: 860px) {
+    .nav-links, .nav-cta .btn { display: none; }
+    .menu-btn { display: grid; }
+    .mobile-menu.open { display: block; position: absolute; top: 72px; left: 0; right: 0; background: rgba(7,6,15,.96); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid var(--line-dark); padding: 8px var(--gutter) 24px; }
+    .mobile-menu a { display: block; padding: 14px 0; color: #fff; font-size: 17px; border-bottom: 1px solid var(--line-dark); }
+    .mobile-menu .btn { margin-top: 20px; width: 100%; justify-content: center; border-bottom: 0; }
+    .app-card { grid-column: span 12; min-height: 0; }
+    .band-inner { grid-template-columns: 1fr 1fr; }
+    .band-item { padding: 22px 16px; }
+    .band-item:nth-child(odd) { padding-left: 0; }
+    .band-item:nth-child(2) { border-right: 0; }
+    .band-item:nth-child(-n+2) { border-bottom: 1px solid var(--line-dark); }
+  }
+  @media (max-width: 600px) {
+    .hero { padding-top: 120px; }
+    .showcase { height: 480px; }
+    .phone { width: 210px; height: 440px; border-radius: 36px; padding: 8px; }
+    .phone-screen { border-radius: 29px; }
+    .phone-a { left: 0; }
+    .phone-b { right: 0; }
+    .scr-blumly, .scr-glow { padding: 44px 16px 16px; }
+    .bpm-ring { width: 130px; height: 130px; margin-top: 22px; }
+    .bpm-val strong { font-size: 42px; }
+    .score { width: 124px; height: 124px; margin-top: 16px; }
+    .score-label strong { font-size: 36px; }
+    .bars { height: 64px; }
+    .float-chip { display: none; }
+    .hero-meta { gap: 12px 20px; margin-top: 36px; }
+    .band-item strong { font-size: 22px; }
+    .values { grid-template-columns: 1fr; }
+    .process { grid-template-columns: 1fr; }
+    .app-card { padding: 28px 22px; }
+    .app-card .art { width: 240px; height: 240px; }
+    .soon-card { padding: 26px 22px; }
+    .foot-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+    .reveal { opacity: 1; transform: none; }
+    .ecg path { stroke-dashoffset: 0; stroke-dasharray: none; }
+  }
+</style>
 </head>
 <body>
 
-  <nav>
-    <a href="/" class="nav-logo">App<span>valent</span></a>
-    <ul class="nav-links">
-      <li><a href="#apps">Apps</a></li>
-      <li><a href="#about">About</a></li>
-      <li><a href="mailto:hello@appvalent.com">Contact</a></li>
-    </ul>
-  </nav>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="glowGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#A68BFF"/><stop offset=".55" stop-color="#E77BB0"/><stop offset="1" stop-color="#F5B98A"/>
+    </linearGradient>
+  </defs>
+  <symbol id="i-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-check-circle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.8 2.8L16 10"/></symbol>
+  <symbol id="i-apple" viewBox="0 0 24 24" fill="currentColor"><path d="M16.4 12.6c0-2.4 2-3.6 2.1-3.7-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.7.9-.8 0-1.9-.9-3.2-.8-1.6 0-3.1 1-4 2.4-1.7 3-.4 7.3 1.2 9.7.8 1.2 1.8 2.5 3 2.4 1.2 0 1.7-.8 3.1-.8 1.5 0 1.9.8 3.2.8 1.3 0 2.2-1.2 3-2.4.9-1.4 1.3-2.7 1.3-2.8-.1 0-2.5-1-2.5-3.8zM14 5.4c.7-.8 1.1-1.9 1-3-1 0-2.1.7-2.8 1.5-.6.7-1.2 1.8-1 2.9 1 .1 2.1-.6 2.8-1.4z"/></symbol>
+  <symbol id="i-android" viewBox="0 0 24 24" fill="currentColor"><path d="M17.6 9.5l1.7-3a.4.4 0 00-.7-.4l-1.8 3.1a10.6 10.6 0 00-9.6 0L5.4 6.1a.4.4 0 00-.7.4l1.7 3A9.6 9.6 0 001.5 17h21a9.6 9.6 0 00-4.9-7.5zM7 14.4a1 1 0 110-2 1 1 0 010 2zm10 0a1 1 0 110-2 1 1 0 010 2z"/></symbol>
+  <symbol id="i-sparkle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3zM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8L19 16z"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10.5" width="16" height="10" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 018 0v3"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 00-14.7-4.4L4 8"/><path d="M4 4v4h4"/><path d="M4 13a8 8 0 0014.7 4.4L20 16"/><path d="M20 20v-4h-4"/></symbol>
+  <symbol id="i-layers" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 13l9 5 9-5"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.4 8.2-8 9-4.6-.8-8-4.5-8-9V6l8-3z"/><path d="M9 12l2 2 4-4"/></symbol>
+  <symbol id="i-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18"/><path d="M10.6 5.1A10 10 0 0112 5c5 0 9 4.5 10 7-.4 1-1.2 2.3-2.4 3.6M6.6 6.6C4.4 8 2.8 10.2 2 12c1 2.5 5 7 10 7 1.8 0 3.4-.6 4.8-1.4"/><path d="M9.9 9.9a3 3 0 004.2 4.2"/></symbol>
+  <symbol id="i-chip" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3.5 6.5l8.5 6 8.5-6"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6a2 2 0 00-2-2H6a2 2 0 00-2 2v8a2 2 0 002 2h2"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2-4 3 8 2-4h7"/></symbol>
+</svg>
 
-  <!-- Hero -->
-  <section class="hero">
+<!-- NAV -->
+<header class="nav" id="nav">
+  <div class="wrap nav-inner">
+    <a href="/" class="logo" aria-label="Appvalent home">
+      <span class="logo-mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19L12 5l7 14"/><path d="M8.5 13.5h7"/></svg></span>
+      Appvalent
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="#apps">Apps</a>
+      <a href="#about">About</a>
+      <a href="#approach">Approach</a>
+      <a href="#privacy">Privacy</a>
+    </nav>
+    <div class="nav-cta">
+      <a href="mailto:support@appvalent.com" class="btn btn-primary">Get in touch <svg><use href="#i-arrow"/></svg></a>
+      <button class="menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#apps">Apps</a>
+    <a href="#about">About</a>
+    <a href="#approach">Approach</a>
+    <a href="#privacy">Privacy</a>
+    <a href="mailto:support@appvalent.com" class="btn btn-primary">Get in touch</a>
+  </div>
+</header>
+
+<main>
+<!-- HERO -->
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <span class="eyebrow reveal"><b>Indie</b> App studio · iOS &amp; Android</span>
+      <h1 class="reveal d1">Apps that <span class="serif grad-text">matter</span> to people's lives.</h1>
+      <p class="hero-lead reveal d2">We design, build and maintain thoughtful, beautifully crafted mobile experiences — made for the moments people care about most.</p>
+      <div class="hero-actions reveal d3">
+        <a href="#apps" class="btn btn-primary">Explore our apps <svg><use href="#i-down"/></svg></a>
+        <a href="#about" class="btn btn-ghost">About the studio</a>
+      </div>
+      <div class="hero-meta reveal d3">
+        <div><svg><use href="#i-check-circle"/></svg>Native-quality iOS &amp; Android</div>
+        <div><svg><use href="#i-check-circle"/></svg>Privacy-minded by default</div>
+        <div><svg><use href="#i-check-circle"/></svg>Maintained for the long run</div>
+      </div>
+    </div>
+
+    <div class="showcase reveal d2" aria-hidden="true">
+      <!-- Blumly -->
+      <div class="phone phone-a">
+        <div class="phone-screen scr-blumly">
+          <span class="phone-notch"></span>
+          <div class="scr-top"><img src="/bellybeat/app-icon.png" alt=""><span class="pill-live"><i></i>Listening</span></div>
+          <div class="bpm-ring"><div class="bpm-val"><strong id="bpm">142</strong><span>BPM</span></div></div>
+          <svg class="ecg" viewBox="0 0 240 64" preserveAspectRatio="none"><path d="M0 34 H40 L48 34 L54 22 L60 46 L68 6 L76 58 L82 34 H120 L128 34 L134 22 L140 46 L148 6 L156 58 L162 34 H240"/></svg>
+          <div class="scr-cards">
+            <div class="scr-card"><small>Week</small><b>24</b></div>
+            <div class="scr-card"><small>Session</small><b>02:18</b></div>
+          </div>
+        </div>
+      </div>
+      <!-- Glow -->
+      <div class="phone phone-b">
+        <div class="phone-screen scr-glow">
+          <span class="phone-notch"></span>
+          <div class="scr-top"><img src="/glow/app-icon.png" alt=""><span>Today</span></div>
+          <div class="score">
+            <svg viewBox="0 0 160 160"><circle class="track" cx="80" cy="80" r="70"/><circle class="bar" cx="80" cy="80" r="70"/></svg>
+            <div class="score-label"><div><strong>86</strong><span>Skin score</span></div></div>
+          </div>
+          <div class="glow-delta">▲ 4 pts this week</div>
+          <div class="bars"><i style="height:45%"></i><i style="height:52%"></i><i style="height:48%"></i><i style="height:63%"></i><i style="height:70%"></i><i style="height:76%"></i><i style="height:88%"></i></div>
+          <div class="metrics"><div><small>Clarity</small><b>91</b></div><div><small>Tone</small><b>84</b></div><div><small>Glow</small><b>82</b></div></div>
+        </div>
+      </div>
+      <div class="float-chip chip-1"><span class="ic"><svg><use href="#i-shield"/></svg></span><div>Private by design<small>Your data stays yours</small></div></div>
+      <div class="float-chip chip-2"><span class="ic"><svg><use href="#i-refresh"/></svg></span><div>Regular updates<small>Shaped by user feedback</small></div></div>
+    </div>
+  </div>
+  <div class="hero-fade"></div>
+</section>
+
+<!-- BAND -->
+<div class="band">
+  <div class="wrap band-inner">
+    <div class="band-item"><strong>2</strong><span>Apps live today</span></div>
+    <div class="band-item"><strong>iOS + Android</strong><span>Built for both platforms</span></div>
+    <div class="band-item"><strong>0</strong><span>User data sold. Ever.</span></div>
+    <div class="band-item"><strong>100%</strong><span>Indie, proudly</span></div>
+  </div>
+</div>
+
+<!-- APPS -->
+<section class="section" id="apps">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="kicker reveal">Our apps</span>
+        <h2 class="h2 reveal d1">Made with care,<br><span class="serif">built to last.</span></h2>
+      </div>
+      <p class="lead reveal d2">Each app we build solves a real problem for real people — designed with attention to every detail, and supported long after launch.</p>
+    </div>
+
+    <div class="apps-grid">
+      <article class="app-card blumly reveal">
+        <div class="art"></div>
+        <div class="app-head">
+          <img class="app-icon" src="/bellybeat/app-icon.png" alt="Blumly app icon" width="72" height="72">
+          <div><div class="app-cat">Pregnancy &amp; Wellness</div><h3 class="app-name">Blumly</h3></div>
+        </div>
+        <p class="app-desc">Hear your baby's heartbeat. Track every precious moment of your pregnancy journey.</p>
+        <ul class="feature-list">
+          <li><svg><use href="#i-heart"/></svg>Listen to and record your baby's heartbeat</li>
+          <li><svg><use href="#i-check-circle"/></svg>Follow your pregnancy week by week</li>
+          <li><svg><use href="#i-check-circle"/></svg>Save and revisit every precious moment</li>
+        </ul>
+        <div class="app-foot">
+          <div class="platforms"><span class="platform"><svg><use href="#i-android"/></svg>Android</span></div>
+          <a href="/bellybeat" class="link-arrow stretched">Learn more <svg><use href="#i-arrow"/></svg></a>
+        </div>
+      </article>
+
+      <article class="app-card glow reveal d1">
+        <div class="art"></div>
+        <div class="app-head">
+          <img class="app-icon glow-bg" src="/glow/app-icon.png" alt="Glow: Face Score app icon" width="72" height="72">
+          <div><div class="app-cat">Beauty &amp; Skincare</div><h3 class="app-name">Glow: Face Score</h3></div>
+        </div>
+        <p class="app-desc">One selfie a day, measured on your phone. Track how your skin changes over time.</p>
+        <ul class="feature-list">
+          <li><svg><use href="#i-sparkle"/></svg>A daily skin score from a single selfie</li>
+          <li><svg><use href="#i-chip"/></svg>Measured on your phone</li>
+          <li><svg><use href="#i-check-circle"/></svg>See your progress over weeks and months</li>
+        </ul>
+        <div class="app-foot">
+          <div class="platforms"><span class="platform"><svg><use href="#i-apple"/></svg>iOS</span><span class="platform"><svg><use href="#i-android"/></svg>Android</span></div>
+          <a href="/glow" class="link-arrow stretched">Learn more <svg><use href="#i-arrow"/></svg></a>
+        </div>
+      </article>
+
+      <div class="soon-card reveal">
+        <div class="soon-left">
+          <div class="soon-icon">✦</div>
+          <div><h3>Next app</h3><p>Something new is in the works. Stay tuned.</p></div>
+        </div>
+        <span class="badge-soon"><i></i>Coming soon</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT / PRINCIPLES -->
+<section class="section principles" id="about">
+  <div class="wrap about-grid">
+    <div class="about-sticky">
+      <span class="kicker reveal">About us</span>
+      <h2 class="h2 reveal d1">Small team,<br><span class="serif">big ambitions.</span></h2>
+      <p class="lead reveal d2">Appvalent Limited is an indie app studio dedicated to building high-quality mobile apps that make a meaningful difference in everyday life.</p>
+      <p class="lead reveal d3">No investors to answer to and no shortcuts — just a focused team that owns every detail, from the first sketch to the hundredth update.</p>
+    </div>
+    <div class="values">
+      <div class="value reveal"><div class="value-ic"><svg><use href="#i-sparkle"/></svg></div><h3>Quality first</h3><p>Every pixel, interaction, and feature is considered carefully before it ships.</p></div>
+      <div class="value reveal d1"><div class="value-ic"><svg><use href="#i-lock"/></svg></div><h3>Privacy minded</h3><p>We collect only what's necessary and never sell user data to third parties.</p></div>
+      <div class="value reveal d1"><div class="value-ic"><svg><use href="#i-refresh"/></svg></div><h3>Always improving</h3><p>We listen to our users and ship regular updates based on real feedback.</p></div>
+      <div class="value reveal d2"><div class="value-ic"><svg><use href="#i-layers"/></svg></div><h3>Built to last</h3><p>We're in this for the long run — our apps are maintained and supported over time.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- APPROACH -->
+<section class="section" id="approach">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="kicker reveal">Our approach</span>
+        <h2 class="h2 reveal d1">From real problem<br>to <span class="serif">everyday companion.</span></h2>
+      </div>
+      <p class="lead reveal d2">A deliberate, end-to-end process that keeps the people using our apps at the centre of every decision.</p>
+    </div>
+    <div class="process">
+      <div class="step reveal"><span class="bar-line"></span><h3>Discover</h3><p>Start with a genuine need in people's lives — not a feature list.</p></div>
+      <div class="step reveal d1"><span class="bar-line"></span><h3>Design</h3><p>Shape calm, intuitive experiences, refined until every interaction feels right.</p></div>
+      <div class="step reveal d2"><span class="bar-line"></span><h3>Build</h3><p>Engineer fast, reliable apps for iOS and Android with privacy built in.</p></div>
+      <div class="step reveal d3"><span class="bar-line"></span><h3>Evolve</h3><p>Listen, measure and ship regular improvements for years, not months.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- PRIVACY -->
+<section class="section privacy" id="privacy">
+  <div class="wrap privacy-grid">
     <div>
-      <div class="hero-eyebrow">Appvalent Limited</div>
-      <h1>Apps that <em>matter</em><br>to people's lives</h1>
-      <p class="hero-sub">We build thoughtful, beautifully crafted mobile experiences for iOS and Android.</p>
-      <a href="#apps" class="hero-cta">Explore our apps ↓</a>
+      <span class="kicker reveal">Privacy</span>
+      <h2 class="h2 reveal d1">Trust is the <span class="serif">foundation</span>, not a feature.</h2>
+      <p class="lead reveal d2">Our apps live alongside some of the most personal moments in people's lives. We treat that responsibility seriously — collecting only what's needed and never selling user data.</p>
     </div>
-  </section>
+    <div class="shield-panel reveal d2">
+      <div class="shield-row"><span class="ic"><svg><use href="#i-eye-off"/></svg></span><div><strong>Data minimisation</strong><small>We collect only what's necessary for the app to work.</small></div><span class="check"><svg><use href="#i-check"/></svg></span></div>
+      <div class="shield-row"><span class="ic"><svg><use href="#i-shield"/></svg></span><div><strong>Never sold</strong><small>User data is never sold to third parties.</small></div><span class="check"><svg><use href="#i-check"/></svg></span></div>
+      <div class="shield-row"><span class="ic"><svg><use href="#i-refresh"/></svg></span><div><strong>Actively maintained</strong><small>Ongoing updates and long-term support.</small></div><span class="check"><svg><use href="#i-check"/></svg></span></div>
+      <div class="shield-row"><span class="ic"><svg><use href="#i-mail"/></svg></span><div><strong>A real team, reachable</strong><small>Questions go straight to the people who build the apps.</small></div><span class="check"><svg><use href="#i-check"/></svg></span></div>
+    </div>
+  </div>
+</section>
 
-  <!-- Apps -->
-  <section class="apps-section" id="apps">
-    <div class="container">
-      <div class="apps-header">
-        <div class="section-label">Our Apps</div>
-        <h2 class="section-title">Made with care,<br>built to last</h2>
-        <p class="section-sub">Each app we build solves a real problem for real people — designed with attention to every detail.</p>
-      </div>
-      <div class="apps-grid">
-
-        <!-- BellyBeat -->
-        <a href="/bellybeat" class="app-card">
-          <div class="app-icon"><img src="/bellybeat/app-icon.png" alt="Blumly icon" /></div>
-          <div>
-            <div class="app-card-name">Blumly</div>
-            <div class="app-card-tagline">Hear your baby's heartbeat. Track every precious moment of your pregnancy journey.</div>
-          </div>
-          <div class="app-card-platforms">
-            <span class="platform-badge">Android</span>
-            <span class="app-card-arrow">→</span>
-          </div>
-        </a>
-
-        <!-- Glow -->
-        <a href="/glow" class="app-card">
-          <div class="app-icon"><img src="/glow/app-icon.png" alt="Glow: Face Score icon" /></div>
-          <div>
-            <div class="app-card-name">Glow: Face Score</div>
-            <div class="app-card-tagline">One selfie a day, measured on your phone. Track how your skin changes over time.</div>
-          </div>
-          <div class="app-card-platforms">
-            <span class="platform-badge">iOS</span>
-            <span class="platform-badge">Android</span>
-            <span class="app-card-arrow">→</span>
-          </div>
-        </a>
-
-        <!-- Coming soon slot -->
-        <div class="app-card app-card-soon">
-          <div class="app-icon" style="background:rgba(0,0,0,0.05);font-size:28px;">✦</div>
-          <div>
-            <div class="app-card-name" style="color:#9898A8;">Next App</div>
-            <div class="app-card-tagline">Something new is in the works. Stay tuned.</div>
-          </div>
-          <div><span class="soon-badge">Coming soon</span></div>
-        </div>
-
+<!-- CTA -->
+<section class="section" id="contact">
+  <div class="wrap">
+    <div class="cta-box reveal">
+      <span class="kicker">Contact</span>
+      <h2 class="h2">Have an app idea, a question or a <span class="serif grad-text">project</span> in mind?</h2>
+      <p class="lead">We partner with organisations and founders to build mobile apps for iOS and Android. Reach out and you'll hear back from the team directly.</p>
+      <div class="cta-actions">
+        <a href="mailto:support@appvalent.com" class="btn btn-dark"><svg><use href="#i-mail"/></svg>support@appvalent.com</a>
+        <button type="button" class="btn btn-outline copy-btn" id="copyBtn"><svg><use href="#i-copy"/></svg><span>Copy email</span></button>
       </div>
     </div>
-  </section>
+  </div>
+</section>
+</main>
 
-  <!-- About -->
-  <section class="about-section" id="about">
-    <div class="container">
-      <div class="section-label">About Us</div>
-      <h2 class="section-title">Small team,<br>big ambitions</h2>
-      <p class="section-sub">Appvalent Limited is an independent app studio dedicated to building high-quality mobile applications that make a meaningful difference in everyday life.</p>
-      <div class="about-grid">
-        <div class="about-item">
-          <h3>Quality First</h3>
-          <p>Every pixel, interaction, and feature is considered carefully before it ships.</p>
-        </div>
-        <div class="about-item">
-          <h3>Privacy Minded</h3>
-          <p>We collect only what's necessary and never sell user data to third parties.</p>
-        </div>
-        <div class="about-item">
-          <h3>Always Improving</h3>
-          <p>We listen to our users and ship regular updates based on real feedback.</p>
-        </div>
-        <div class="about-item">
-          <h3>Built to Last</h3>
-          <p>We're in this for the long run — our apps are maintained and supported over time.</p>
-        </div>
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a href="/" class="logo"><span class="logo-mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19L12 5l7 14"/><path d="M8.5 13.5h7"/></svg></span>Appvalent</a>
+        <p>An indie app studio building thoughtful mobile apps for iOS and Android.</p>
       </div>
+      <div><h4>Apps</h4><ul><li><a href="/bellybeat">Blumly</a></li><li><a href="/glow">Glow: Face Score</a></li></ul></div>
+      <div><h4>Studio</h4><ul><li><a href="#about">About</a></li><li><a href="#approach">Approach</a></li><li><a href="#privacy">Privacy</a></li></ul></div>
+      <div><h4>Contact</h4><ul><li><a href="mailto:support@appvalent.com">support@appvalent.com</a></li></ul></div>
     </div>
-  </section>
-
-  <!-- Footer -->
-  <footer>
-    <div class="footer-inner">
-      <a href="/" class="footer-logo">App<span>valent</span></a>
-      <ul class="footer-links">
-        <li><a href="#apps">Apps</a></li>
-        <li><a href="/bellybeat">Blumly</a></li>
-        <li><a href="mailto:hello@appvalent.com">Contact</a></li>
-      </ul>
-      <div class="footer-copy">© 2026 Appvalent Limited. All rights reserved.</div>
+    <div class="foot-bottom">
+      <span>© <span id="year">2026</span> Appvalent Limited. All rights reserved.</span>
+      <span class="status"><i></i>All apps operational</span>
     </div>
-  </footer>
+  </div>
+</footer>
 
+<script>
+  // Nav background on scroll
+  const nav = document.getElementById('nav');
+  const onScroll = () => nav.classList.toggle('scrolled', window.scrollY > 12);
+  onScroll(); window.addEventListener('scroll', onScroll, { passive: true });
+
+  // Mobile menu
+  const menuBtn = document.getElementById('menuBtn'), menu = document.getElementById('mobileMenu');
+  menuBtn.addEventListener('click', () => {
+    const open = menu.classList.toggle('open');
+    menuBtn.setAttribute('aria-expanded', open);
+    nav.classList.add('scrolled');
+  });
+  menu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => { menu.classList.remove('open'); menuBtn.setAttribute('aria-expanded', false); }));
+
+  // Reveal on scroll
+  const io = new IntersectionObserver(entries => entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: .12, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  // Live BPM flicker
+  const bpm = document.getElementById('bpm');
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    setInterval(() => { bpm.textContent = 138 + Math.round(Math.random() * 8); }, 1400);
+  }
+
+  // Copy email
+  const copyBtn = document.getElementById('copyBtn');
+  copyBtn.addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText('support@appvalent.com'); } catch (e) { return; }
+    copyBtn.classList.add('copied'); copyBtn.querySelector('span').textContent = 'Copied';
+    setTimeout(() => { copyBtn.classList.remove('copied'); copyBtn.querySelector('span').textContent = 'Copy email'; }, 1800);
+  });
+
+  document.getElementById('year').textContent = new Date().getFullYear();
+</script>
 </body>
 </html>
